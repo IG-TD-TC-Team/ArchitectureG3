@@ -1,0 +1,1 @@
+# ArchitectureG3
