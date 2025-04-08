@@ -11,7 +11,6 @@ namespace DAL.Models
         public A4BlackAndWhite(string description, decimal pricePerUnit)
         {
             Name = "A4 black and White";
-            ProductId = Guid.NewGuid().ToString();
             Description = description;
             PricePerUnit = pricePerUnit;
             Color = false;
@@ -19,12 +18,12 @@ namespace DAL.Models
             PaperType = "EcoPaper";
 
         }
-        public override  string ProductId { get; set ; }
-        public override  string Name { get ; set ; }
-        public override string Description { get; set; } = null;
+        
+        public override  string Name { get ; }
+        public override string Description { get; set; }
         public override  decimal PricePerUnit { get ; set ; }
-        public override  bool Color { get ; set ; }
-        public override  string PaperSize { get ; set; }
-        public override  string PaperType { get ; set ; }
+        public override  bool Color { get ; }
+        public override  string PaperSize { get ; }
+        public override  string PaperType { get ;}
     }
 }
