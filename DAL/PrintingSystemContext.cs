@@ -7,20 +7,20 @@ namespace DAL
 {
     public class PrintingSystemContext : DbContext
     {
-        public DbSet<AbstractUser> Users { get; set; }
-        public DbSet<AbstractProduct> Products { get; set; }
+        public DbSet<User> Users { get; set; }
+        public DbSet<Product> Products { get; set; }
         public DbSet<Balance> Balances { get; set; }
 
         // Seed data arrays. Since AbstractUser is abstract, make sure you use concrete types
-        private static readonly AbstractUser[] _users = new AbstractUser[]
+        private static readonly User[] _users = new User[]
         {
-            new Student("Julio", "Julio", "Cortés", "Test"),
-            new Student("Pablo", "Pablo", "Escobar", "Test2025")
+            new User("Julio", "Julio", "Cortés", "Test"),
+            new User("Pablo", "Pablo", "Escobar", "Test2025")
         };
 
-        private static readonly AbstractProduct[] _products = new AbstractProduct[]
+        private static readonly Product[] _products = new Product[]
         {
-            new A4BlackAndWhite("Common printing", 10)
+            new Product("Common printing", 10)
         };
 
         protected override void OnConfiguring(DbContextOptionsBuilder builder)
@@ -35,12 +35,12 @@ namespace DAL
                     foreach (var user in _users)
                     {
                         // Note: using a concrete type is necessary because AbstractUser is abstract.
-                        var existingUser = context.Set<AbstractUser>()
+                        var existingUser = context.Set<User>()
                             .FirstOrDefault(u => u.UserID == user.UserID);
 
                         if (existingUser == null)
                         {
-                            context.Set<AbstractUser>().Add(user);
+                            context.Set<User>().Add(user);
                         }
                     }
                     try
@@ -57,12 +57,12 @@ namespace DAL
                     // Seed products
                     foreach (var product in _products)
                     {
-                        var existingProduct = context.Set<AbstractProduct>()
+                        var existingProduct = context.Set<Product>()
                             .FirstOrDefault(p => p.ProductId == product.ProductId);
 
                         if (existingProduct == null)
                         {
-                            context.Set<AbstractProduct>().Add(product);
+                            context.Set<Product>().Add(product);
                         }
                     }
                     try
@@ -77,7 +77,7 @@ namespace DAL
                     }
 
                     // Create initial balances for users if needed
-                    foreach (var user in context.Set<AbstractUser>().ToList())
+                    foreach (var user in context.Set<User>().ToList())
                     {
                         if (!user.Balances.Any())
                         {
@@ -85,10 +85,9 @@ namespace DAL
                             {
                                 User = user,
                                 MoneyCHF = 0,
-                                StandardQuota = 100,
+                                StandardQuotaCHF = 100,
                                 TransactionDate = DateTime.Now
-                                // Note: If you want to use BalanceId as the PK rather than a composite key,
-                                // adjust the entity configuration and remove the composite key configuration in OnModelCreating.
+                                
                             };
                             context.Set<Balance>().Add(balance);
                             user.Balances.Add(balance);
@@ -100,9 +99,9 @@ namespace DAL
                     }
                     catch (Exception ex)
                     {
-                        Console.WriteLine("❌ SaveChanges failed (Balances): " + ex.Message);
+                        Console.WriteLine("SaveChanges failed (Balances): " + ex.Message);
                         if (ex.InnerException != null)
-                            Console.WriteLine("🔍 Inner Exception: " + ex.InnerException.Message);
+                            Console.WriteLine("Inner Exception: " + ex.InnerException.Message);
                     }
                 });
         }
@@ -110,20 +109,20 @@ namespace DAL
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             // Configure AbstractUser as the base type using a discriminator column.
-            modelBuilder.Entity<AbstractUser>()
+            modelBuilder.Entity<User>()
                 .HasDiscriminator<string>("UserType")
-                .HasValue<Student>("Student");
+                .HasValue<User>("User");
             // .HasValue<Professor>("Professor"); // Uncomment if adding more user types.
 
             // Configure AbstractProduct as the base type using a discriminator column.
-            modelBuilder.Entity<AbstractProduct>()
+            modelBuilder.Entity<Product>()
                 .HasDiscriminator<string>("ProductType")
-                .HasValue<A4BlackAndWhite>("A4BW");
+                .HasValue<Product>("Product");
             // .HasValue<A4Color>("A4Color");  // Uncomment if needed.
 
             // Configure primary keys.
-            modelBuilder.Entity<AbstractUser>().HasKey(u => u.UserID);
-            modelBuilder.Entity<AbstractProduct>().HasKey(p => p.ProductId);
+            modelBuilder.Entity<User>().HasKey(u => u.UserID);
+            modelBuilder.Entity<Product>().HasKey(p => p.ProductId);
 
             // Configure composite key for Balance.
             // Consider switching to BalanceId as PK if TransactionDate might collide.
@@ -132,7 +131,7 @@ namespace DAL
 
 
             // Configure relationship: One User has many Balances.
-            modelBuilder.Entity<AbstractUser>()
+            modelBuilder.Entity<User>()
                 .HasMany(u => u.Balances)
                 .WithOne(b => b.User)
                 .HasForeignKey(b => b.UserID);
