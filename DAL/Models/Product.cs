@@ -16,7 +16,7 @@ namespace DAL.Models
 
             Name = "A4_BW";
             Description = "A4 black and White";
-            PricePerUnit = 0.1;
+            PricePerUnit = 0.1M;
             PrintQuotaCost = 1;
             Color = false;
             PaperSize = "A4";

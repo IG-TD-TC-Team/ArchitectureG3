@@ -19,7 +19,6 @@ namespace DAL.Models
             Username = GenerateUsername(firstName, lastName, context);
 
             Card = new Card(UserID);
-            CardID = Card.CardID;
 
             CopyQuota = 0;
             CHF = 0m;
@@ -32,6 +31,7 @@ namespace DAL.Models
         public string FirstName { get; set; }
         public string LastName { get; set; }
         public string Password { get; set; }
+        public Card Card { get; set; }
 
         // Unique username generation
         private string GenerateUsername(string firstName, string lastName, PrintingSystemContext context)

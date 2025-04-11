@@ -1,27 +1,30 @@
 ﻿using System;
 using DAL.Models;
 
-public class Card
+namespace DAL.Models
 {
-    public Card(Guid userid)
+    public class Card
     {
-        CardID = Guid.NewGuid();
-        UserID = userid;
+        public Card(Guid userid)
+        {
+            CardID = Guid.NewGuid();
+            UserID = userid;
 
-        CreationDate = DateTime.UtcNow;
-        ExpirationDate = CreationDate.AddYears(4);
+            CreationDate = DateTime.UtcNow;
+            ExpirationDate = CreationDate.AddYears(4);
 
-        IsActive = true;
+            IsActive = true;
+        }
+
+        public Guid CardID { get; set; }
+
+        public Guid UserID { get; set; }
+        public User User { get; set; }
+
+        // Dates
+        public DateTime CreationDate { get; set; }
+        public DateTime ExpirationDate { get; set; }
+
+        public bool IsActive { get; set; }
     }
-
-    public Guid CardID { get; set; }
-
-    public Guid UserID { get; set; }
-    public User User { get; set; }
-
-    // Dates
-    public DateTime CreationDate { get; set; }
-    public DateTime ExpirationDate { get; set; }
-
-    public bool IsActive { get; set; }
 }
