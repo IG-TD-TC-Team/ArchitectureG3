@@ -1,4 +1,5 @@
 ﻿using System;
+using DAL.Models;
 
 public class Card
 {

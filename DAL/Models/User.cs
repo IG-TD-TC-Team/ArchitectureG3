@@ -18,7 +18,7 @@ namespace DAL.Models
             Password = password;
             Username = GenerateUsername(firstName, lastName, context);
 
-            Card = new Card(UserID); 
+            Card = new Card(UserID);
             CardID = Card.CardID;
 
             CopyQuota = 0;

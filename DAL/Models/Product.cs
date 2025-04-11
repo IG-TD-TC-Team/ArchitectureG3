@@ -24,7 +24,7 @@ namespace DAL.Models
         }
 
         //For eventual other products
-        public Product(string name, string description, decimal pricePerUnit, boolean color, string papersize, string papertype)
+        public Product(string name, string description, decimal pricePerUnit, bool color, string papersize, string papertype)
         {
             ProductID = Guid.NewGuid();
 
@@ -39,12 +39,12 @@ namespace DAL.Models
 
         public Guid ProductID { get; set; }
         public string Name { get; set; }
-        public  string Description { get; set; }
-        public  decimal PricePerUnit { get; set; }
+        public string Description { get; set; }
+        public decimal PricePerUnit { get; set; }
         public decimal PrintQuotaCost { get; set; }
-        public  bool Color { get; set; }
-        public  string PaperSize { get; set; }
-        public  string PaperType { get; set; }
+        public bool Color { get; set; }
+        public string PaperSize { get; set; }
+        public string PaperType { get; set; }
 
 
     }
