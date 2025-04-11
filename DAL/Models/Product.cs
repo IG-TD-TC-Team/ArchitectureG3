@@ -8,29 +8,43 @@ namespace DAL.Models
 {
     public class Product
     {
-        public Product(string description, decimal pricePerUnit)
+
+        //Default constructor
+        public Product()
         {
-            Name = "A4 black and White";
-            Description = description;
-            PricePerUnit = pricePerUnit;
+            ProductID = Guid.NewGuid();
+
+            Name = "A4_BW";
+            Description = "A4 black and White";
+            PricePerUnit = 0.1;
+            PrintQuotaCost = 1;
             Color = false;
             PaperSize = "A4";
-            PaperType = "EcoPaper";
+            PaperType = "StandardPaper";
+        }
+
+        //For eventual other products
+        public Product(string name, string description, decimal pricePerUnit, boolean color, string papersize, string papertype)
+        {
+            ProductID = Guid.NewGuid();
+
+            Name = name;
+            Description = description;
+            PricePerUnit = pricePerUnit;
+            Color = color;
+            PaperSize = papersize;
+            PaperType = papertype;
         }
 
 
-
-
-        public Guid ProductId { get; }
-        public string Name { get;}
+        public Guid ProductID { get; set; }
+        public string Name { get; set; }
         public  string Description { get; set; }
         public  decimal PricePerUnit { get; set; }
-        public  bool Color { get; }
-        public  string PaperSize { get; }
-        public  string PaperType { get; }
-
-        public Guid? BalanceId { get; set; }  // Foreign key linking to Balance table
-        public virtual Balance Balance { get; set; }
+        public decimal PrintQuotaCost { get; set; }
+        public  bool Color { get; set; }
+        public  string PaperSize { get; set; }
+        public  string PaperType { get; set; }
 
 
     }
