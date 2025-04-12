@@ -3,59 +3,89 @@ using System.Collections.Generic;
 using DAL;
 using System.Linq;
 
-
 namespace DAL.Models
 {
+    /// <summary>
+    /// Represents a user of the printing system.
+    /// </summary>
     public class User
     {
-        public User(string firstName, string lastName, string password, PrintingSystemContext context)
+        /// <summary>
+        /// Parameterless constructor required by Entity Framework Core.
+        /// Protected to prevent misuse outside EF context.
+        /// </summary>
+        protected User() { }
+
+        /// <summary>
+        /// Creates a new user with personal details and initializes default values.
+        /// </summary>
+        /// <param name="firstName">User's first name.</param>
+        /// <param name="lastName">User's last name.</param>
+        /// <param name="password">Password for authentication (should be hashed in production).</param>
+        /// <param name="username">Unique username for login.</param>
+        public User(string firstName, string lastName, string password, string username)
         {
-
-            UserID = Guid.NewGuid();
-
+            UserID = Guid.NewGuid();                  // Generate a unique user ID
             FirstName = firstName;
             LastName = lastName;
-            Password = password;
-            Username = GenerateUsername(firstName, lastName, context);
+            Password = password;                      // NOTE: Store hashed passwords in real systems
+            Username = username;
 
-            Card = new Card(UserID);
+            Card = new Card(UserID);                  // Create a new card assigned to the user
 
-            CopyQuota = 0;
-            CHF = 0m;
-            QuotaCHF = 0m;
+            // Initialize account values
+            CopyQuota = 0;                            // Number of copies available
+            CHF = 0m;                                 // Monetary balance
+            QuotaCHF = 0m;                            // Quota balance in CHF
         }
 
-        // Basis for user
+        // ───── Identity Information ─────
+
+        /// <summary>
+        /// Unique identifier for the user.
+        /// </summary>
         public Guid UserID { get; set; }
+
+        /// <summary>
+        /// Username used to log in.
+        /// </summary>
         public string Username { get; set; }
+
+        /// <summary>
+        /// First name of the user.
+        /// </summary>
         public string FirstName { get; set; }
+
+        /// <summary>
+        /// Last name of the user.
+        /// </summary>
         public string LastName { get; set; }
+
+        /// <summary>
+        /// Password used for authentication.
+        /// </summary>
         public string Password { get; set; }
+
+        /// <summary>
+        /// The card associated with the user.
+        /// </summary>
         public Card Card { get; set; }
 
-        // Unique username generation
-        private string GenerateUsername(string firstName, string lastName, PrintingSystemContext context)
-        {
-            string firstPart = firstName.Length >= 3 ? firstName.Substring(0, 3) : firstName.PadRight(3, 'x');
-            string lastPart = lastName.Length >= 3 ? lastName.Substring(0, 3) : lastName.PadRight(3, 'x');
+        // ───── Printing Quotas and Account Balances ─────
 
-            string baseUsername = (firstPart + lastPart).ToLower();
-            string username = baseUsername;
-            int counter = 1;
-
-            // Check for existing usernames
-            while (context.Users.Any(u => u.Username == username))
-            {
-                username = baseUsername + counter;
-                counter++;
-            }
-
-            return username;
-        }
-
-        // Printing data
+        /// <summary>
+        /// Number of pages the user can still print/copy.
+        /// </summary>
         public int CopyQuota { get; set; }
+
+        /// <summary>
+        /// Real money balance (CHF) available on the user’s account.
+        /// </summary>
         public decimal CHF { get; set; }
+
+        /// <summary>
+        /// Balance in CHF that corresponds to the user's print quota.
+        /// </summary>
         public decimal QuotaCHF { get; set; }
     }
 }

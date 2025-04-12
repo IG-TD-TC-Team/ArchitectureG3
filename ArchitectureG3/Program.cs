@@ -9,10 +9,23 @@ namespace PrintingSystemInitializer
         {
             Console.WriteLine("Initializing Printing System Database...");
 
-            // Create and initialize the database by applying pending migrations.
             using (var context = new PrintingSystemContext())
             {
-                DbInitializer.Migrate();
+                // Create the database and schema
+                context.Database.EnsureDeleted(); // Optional: To start from 0 for testing
+                context.Database.EnsureCreated();
+
+                // Seed the Data
+                try
+                {
+                    DatabaseInitializator.SeedData(context);
+                    Console.WriteLine("Database initialized successfully!");
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"Initialization failed: {ex.Message}");
+                    Console.WriteLine(ex.StackTrace);
+                }
             }
 
             Console.WriteLine("Press any key to exit...");
