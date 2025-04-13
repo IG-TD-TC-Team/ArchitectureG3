@@ -7,23 +7,60 @@ namespace DAL
 {
     public class PrintingSystemContext : DbContext
     {
-        public DbSet<AbstractUser> Users { get; set; }
-        public DbSet<AbstractProduct> Products { get; set; }
-        public DbSet<Balance> Balances { get; set; }
+        public DbSet<User> Users { get; set; }
+        public DbSet<Product> Products { get; set; }
+        public DbSet<Card> Cards { get; set; }
 
-        private static AbstractUser[] _users = new[]
+        protected override void OnConfiguring(DbContextOptionsBuilder builder)
         {
-            new Student("Julio", "Julio", "Cortés", "Test"),
-            new Student("Pablo", "Pablo", "Escobar", "Test2025")
-        };
 
-        private static AbstractProduct[] _products = new[]
+            builder.UseSqlServer(@"Server=(localdb)\mssqllocaldb;Database=PrintingSystemDB")
+                .UseSeeding((context, _) =>
+                {
+                    // Default product
+                    if (!context.Products.Any(p => p.Name == "A4_BW"))
+                    {
+                        context.Products.Add(new Product());
+                        context.SaveChanges();
+                    }
+
+
+
+
+                })
+                .UseAsyncSeeding(async (context, _, cancellationToken) =>
+                {
+                    // Users
+                    if (!await context.Users.AnyAsync(u => u.FirstName == "Tatiana", cancellationToken))
+                    {
+                        context.Users.Add(new User("Tatiana", "Da Costa", "AdminHevs01", context));
+                        await context.SaveChangesAsync(cancellationToken);
+                    }
+
+                    if (!await context.Users.AnyAsync(u => u.FirstName == "Julio", cancellationToken))
+                    {
+                        context.Users.Add(new User("Julio", "Cortès", "AdminHevs01", context));
+                        await context.SaveChangesAsync(cancellationToken);
+                    }
+
+                    if (!await context.Users.AnyAsync(u => u.FirstName == "Sofia", cancellationToken))
+                    {
+                        context.Users.Add(new User("Sofia", "Cortès", "AdminHevs01", context));
+                        await context.SaveChangesAsync(cancellationToken);
+                    }
+
+                });
+
+
+        }
+
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            new A4BlackAndWhite("Common printing", 10 )
+            modelBuilder.Entity<User>()
+                .HasOne(u => u.Card)
+                .WithOne(c => c.User)
+                .HasForeignKey<Card>(c => c.UserID);
 
-
-        };
-
+        }
     }
-
 }
