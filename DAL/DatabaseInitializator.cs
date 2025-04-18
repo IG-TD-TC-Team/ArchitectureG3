@@ -11,7 +11,7 @@ namespace DAL
     public static class DatabaseInitializator
     {
         /// <summary>
-        /// Seeds the database with initial products and users.
+        /// Seeds the database with initial products, users, and sample transactions.
         /// </summary>
         /// <param name="context">The database context used for accessing entities.</param>
         public static void SeedData(PrintingSystemContext context)
@@ -23,6 +23,9 @@ namespace DAL
 
                 // Seed initial users
                 SeedUsers(context);
+
+                // Seed sample transactions
+                SeedTransactions(context);
             }
             catch (Exception ex)
             {
@@ -108,6 +111,107 @@ namespace DAL
                     context.SaveChanges(); // Save after each user
                 }
             }
+        }
+
+        /// <summary>
+        /// Seeds sample printing transactions into the database.
+        /// </summary>
+        private static void SeedTransactions(PrintingSystemContext context)
+        {
+            // Check if we already have transactions in the database
+            if (context.Transactions.Any())
+            {
+                return; // Skip if transactions already exist
+            }
+
+            // Get all users and products for creating sample transactions
+            var users = context.Users.ToList();
+            var products = context.Products.ToList();
+
+            // Exit if we don't have both users and products
+            if (!users.Any() || !products.Any())
+            {
+                Console.WriteLine("Cannot seed transactions: Users or products missing");
+                return;
+            }
+
+            var random = new Random(42); // Using a seed for reproducible results
+
+            // For each user, create 1-3 transactions
+            foreach (var user in users)
+            {
+                int transactionCount = random.Next(1, 4); // 1 to 3 transactions per user
+
+                for (int i = 0; i < transactionCount; i++)
+                {
+                    // Create a new transaction for this user
+                    var transaction = new Transaction(user.UserID)
+                    {
+                        // Set the date to sometime in the last 30 days
+                        Date = DateTime.UtcNow.AddDays(-random.Next(0, 30))
+                    };
+
+                    // Determine how many different products in this transaction (1-3)
+                    int productCount = random.Next(1, 4);
+
+                    // Track transaction totals
+                    int totalCopyQuota = 0;
+                    decimal totalCHF = 0m;
+                    decimal totalQuotaCHF = 0m;
+
+                    // Add 1-3 random products to this transaction
+                    for (int j = 0; j < productCount; j++)
+                    {
+                        // Select a random product
+                        var product = products[random.Next(products.Count)];
+
+                        // Determine quantity (1-20 copies)
+                        int quantity = random.Next(1, 21);
+
+                        // Calculate costs for this transaction product
+                        int copyQuotaCost = (int)(product.PrintQuotaCost * quantity);
+                        decimal chfCost = product.PricePerUnit * quantity;
+                        decimal quotaCHFCost = chfCost; // In a real system, these might differ
+
+                        // Create the transaction product relationship
+                        var transactionProduct = new TransactionProduct(
+                            transaction.TransactionID,
+                            product.ProductID,
+                            quantity)
+                        {
+                            CopyQuotaCost = copyQuotaCost,
+                            CHFCost = chfCost,
+                            QuotaCHFCost = quotaCHFCost
+                        };
+
+                        // Add to the transaction
+                        transaction.TransactionProducts.Add(transactionProduct);
+
+                        // Update transaction totals
+                        totalCopyQuota += copyQuotaCost;
+                        totalCHF += chfCost;
+                        totalQuotaCHF += quotaCHFCost;
+                    }
+
+                    // Set the transaction totals
+                    transaction.TotalCopyQuota = totalCopyQuota;
+                    transaction.TotalCHF = totalCHF;
+                    transaction.TotalQuotaCHF = totalQuotaCHF;
+
+                    // Add the transaction to the context
+                    context.Transactions.Add(transaction);
+
+                    // Update the user's balance - this simulates the effect of the transaction
+                    // Note: this would be handled by business logic
+                    user.CopyQuota -= totalCopyQuota;
+                    user.CHF -= totalCHF;
+                    user.QuotaCHF -= totalQuotaCHF;
+                }
+            }
+
+            // Save all transaction changes to the database
+            context.SaveChanges();
+            Console.WriteLine($"Added {context.Transactions.Count()} sample transactions");
         }
 
         /// <summary>
