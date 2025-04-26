@@ -1,0 +1,6 @@
+@WebAPI_PrintingSystem_HostAddress = http://localhost:5147
+
+GET {{WebAPI_PrintingSystem_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###

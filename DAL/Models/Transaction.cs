@@ -1,11 +1,9 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
 
 namespace DAL.Models
 {
     /// <summary>
-    /// Represents a printing transaction in the system.
+    /// Represents a black and white A4 printing transaction in the system.
     /// </summary>
     public class Transaction
     {
@@ -15,22 +13,39 @@ namespace DAL.Models
         private Transaction() { }
 
         /// <summary>
-        /// Creates a new transaction for a specific user.
+        /// Creates a new A4 B/W printing transaction for a specific user.
         /// </summary>
         /// <param name="userId">The ID of the user making the transaction.</param>
-        public Transaction(Guid userId)
+        /// <param name="pageCount">Number of A4 B/W pages printed.</param>
+        public Transaction(Guid userId, int pageCount, Product product)
         {
+
             TransactionID = Guid.NewGuid();
             Date = DateTime.UtcNow;
             UserID = userId;
+            PageCount = pageCount;
+            Product = product;
+            ProductID = product.ProductID;  // Set the foreign key
 
-            // Initialize default values
-            TotalCopyQuota = 0;
-            TotalCHF = 0m;
-            TotalQuotaCHF = 0m;
 
-            // Initialize collection
-            TransactionProducts = new List<TransactionProduct>();
+        /**
+        * CALCULATION HAVE TO ME MOVED TO THE BUSINESS LAYER
+        */
+
+            // Set totals based on page count
+            TotalCopyQuota = pageCount;
+
+            // Set totals based on page count and product properties
+            TotalCopyQuota = (int)(pageCount * product.PrintQuotaCost); 
+
+            // For monetary calculations
+            TotalCHF = pageCount * product.PricePerUnit;
+
+            // Set total quota in CHF           
+            TotalQuotaCHF = TotalCHF;
+        /**
+        * CALCULATION HAVE TO ME MOVED TO THE BUSINESS LAYER
+        */
         }
 
         /// <summary>
@@ -54,20 +69,28 @@ namespace DAL.Models
         public User User { get; set; }
 
         /// <summary>
-        /// Collection of products included in this transaction.
+        /// Number of A4 B/W pages printed in this transaction.
         /// </summary>
-        public ICollection<TransactionProduct> TransactionProducts { get; set; }
+        public int PageCount { get; set; }
+        /// <summary>
+        /// Foreign key to the product used in this transaction.
+        /// </summary>
+        public Guid ProductID { get; set; }
 
-        
+        /// <summary>
+        /// Product used in this transaction.
+        /// </summary>
+        public Product Product { get; set; }
+
         // ───── Transaction Totals ─────
 
         /// <summary>
-        /// Total printing quota change in this transaction.
+        /// Total printing quota used in this transaction (equals page count for B/W).
         /// </summary>
         public int TotalCopyQuota { get; set; }
 
         /// <summary>
-        /// Total monetary amount (CHF) in this transaction.
+        /// Total monetary amount (CHF) for this transaction.
         /// </summary>
         public decimal TotalCHF { get; set; }
 
@@ -76,13 +99,18 @@ namespace DAL.Models
         /// </summary>
         public decimal TotalQuotaCHF { get; set; }
 
-        ///<result>
-            ///RECEIPT #1234 (Transaction)
-            ///-----------------------------
-            ///2x Paper A4 @ $5.00 = $10.00  (TransactionProduct 1)
-            ///1x Color Toner @ $15.00 = $15.00 (Transactionproduct 2)
-            ///-----------------------------
-            ///TOTAL: $25.00
-        ///</result>
+        /// <summary>
+        /// Applies the transaction effects to the linked user's balance.
+        /// </summary>
+        public void ApplyToUserBalance()
+        {
+            if (User != null)
+            {
+                // Deduct costs from user's account
+                User.CopyQuota -= TotalCopyQuota;
+                User.CHF -= TotalCHF;
+                User.QuotaCHF -= TotalQuotaCHF;
+            }
+        }
     }
 }

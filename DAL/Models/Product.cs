@@ -35,13 +35,13 @@ namespace DAL.Models
         /// <param name="color">Indicates whether the print is in color.</param>
         /// <param name="paperSize">Size of the paper (e.g., A4, A3).</param>
         /// <param name="paperType">Type of paper used.</param>
-        public Product(string name, string description, decimal pricePerUnit, bool color, string paperSize, string paperType)
+        public Product(string name, string description, decimal pricePerUnit,int printQuotaCost , bool color, string paperSize, string paperType)
         {
             ProductID = Guid.NewGuid();                // Generate unique ID
             Name = name;
             Description = description;
             PricePerUnit = pricePerUnit;
-            PrintQuotaCost = color ? 2 : 1;            // Set quota cost: 2 for color, 1 for B/W
+            PrintQuotaCost = printQuotaCost;           
             Color = color;
             PaperSize = paperSize;
             PaperType = paperType;

@@ -15,6 +15,15 @@ namespace DAL
     /// </summary>
     public class PrintingSystemContext : DbContext
     {
+        public PrintingSystemContext()
+        {
+        }
+
+        public PrintingSystemContext(DbContextOptions<PrintingSystemContext> options)
+            : base(options)
+        {
+        }
+
         // DbSets represent tables in the database
         public DbSet<User> Users { get; set; }
         public DbSet<Product> Products { get; set; }
@@ -52,8 +61,7 @@ namespace DAL
             modelBuilder.Entity<Card>().ToTable("Cards");
             // Configure Transaction table
             modelBuilder.Entity<Transaction>().ToTable("Transactions");
-            // Configure TransactionProducts table
-            modelBuilder.Entity<TransactionProduct>().ToTable("TransactionProducts");
+
 
             // Define one-to-one relationship between User and Card
             modelBuilder.Entity<User>()
@@ -69,20 +77,23 @@ namespace DAL
                 .HasForeignKey(t => t.UserID)
                 .OnDelete(DeleteBehavior.Cascade); // If the user is deleted, delete their transactions too
 
-            // Define relationship between Transaction and TransactionProducts (one-to-many)
+
+            // Configure relationship between Transaction and Product
             modelBuilder.Entity<Transaction>()
-                .HasMany(t => t.TransactionProducts)
-                .WithOne(tp => tp.Transaction)
-                .HasForeignKey(tp => tp.TransactionID)
-                .OnDelete(DeleteBehavior.Cascade); // If the transaction is deleted, delete its products too
+                .HasOne(t => t.Product)
+                .WithMany()  // No navigation property back to transactions in Product
+                .HasForeignKey(t => t.ProductID)
+                .OnDelete(DeleteBehavior.Restrict);  // Don't delete products when transactions are deleted
 
-            // Define relationship between TransactionProducts and Product (many-to-one)
-            modelBuilder.Entity<TransactionProduct>()
-                .HasOne(tp => tp.Product)
-                .WithMany()  // Product doesn't need to track which TransactionProducts entries it's in
-                .HasForeignKey(tp => tp.ProductID)
-                .OnDelete(DeleteBehavior.Restrict);  // Don't delete products when a transaction is deleted
+            // Ensure precision for money fields
+            modelBuilder.Entity<Transaction>()
+                .Property(t => t.TotalCHF)
+                .HasColumnType("decimal(18,2)");
 
+            modelBuilder.Entity<Transaction>()
+                .Property(t => t.TotalQuotaCHF)
+                .HasColumnType("decimal(18,2)");
+        
             // Set precision for PricePerUnit field in Product (important for money values)
             modelBuilder.Entity<Product>()
                 .Property(p => p.PricePerUnit)
