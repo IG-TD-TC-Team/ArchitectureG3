@@ -33,10 +33,14 @@ namespace DAL.Models
 
             Card = new Card(UserID);                  // Create a new card assigned to the user
 
+            Transactions = new List<Transaction>();   // Initialize the collection of transactions
+
+            
             // Initialize account values
             CopyQuota = 0;                            // Number of copies available
             CHF = 0m;                                 // Monetary balance
             QuotaCHF = 0m;                            // Quota balance in CHF
+            
         }
 
         // ───── Identity Information ─────
@@ -71,6 +75,13 @@ namespace DAL.Models
         /// </summary>
         public Card Card { get; set; }
 
+        /// <summary>
+        /// Collection of transactions made by the user.
+        /// </summary>
+        public ICollection<Transaction> Transactions { get; set; }
+
+
+       
         // ───── Printing Quotas and Account Balances ─────
 
         /// <summary>
@@ -87,5 +98,6 @@ namespace DAL.Models
         /// Balance in CHF that corresponds to the user's print quota.
         /// </summary>
         public decimal QuotaCHF { get; set; }
+        
     }
 }

@@ -15,10 +15,21 @@ namespace DAL
     /// </summary>
     public class PrintingSystemContext : DbContext
     {
+        public PrintingSystemContext()
+        {
+        }
+
+        public PrintingSystemContext(DbContextOptions<PrintingSystemContext> options)
+            : base(options)
+        {
+        }
+
         // DbSets represent tables in the database
         public DbSet<User> Users { get; set; }
         public DbSet<Product> Products { get; set; }
         public DbSet<Card> Cards { get; set; }
+
+        public DbSet<Transaction> Transactions { get; set; }
 
         /// <summary>
         /// Configures the database connection if it hasn't been configured externally.
@@ -42,9 +53,15 @@ namespace DAL
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             // Set custom table names to match plural forms
+            // Configure the Product table
             modelBuilder.Entity<Product>().ToTable("Products");
+            // Configure the User table
             modelBuilder.Entity<User>().ToTable("Users");
+            // Configure the Card table
             modelBuilder.Entity<Card>().ToTable("Cards");
+            // Configure Transaction table
+            modelBuilder.Entity<Transaction>().ToTable("Transactions");
+
 
             // Define one-to-one relationship between User and Card
             modelBuilder.Entity<User>()
@@ -53,10 +70,36 @@ namespace DAL
                 .HasForeignKey<Card>(c => c.UserID) // The foreign key is on the Card entity
                 .OnDelete(DeleteBehavior.Cascade); // If the user is deleted, delete the card too
 
+            // Define relationship between User and Transactions (one-to-many)
+            modelBuilder.Entity<User>()
+                .HasMany(u => u.Transactions)
+                .WithOne(t => t.User)
+                .HasForeignKey(t => t.UserID)
+                .OnDelete(DeleteBehavior.Cascade); // If the user is deleted, delete their transactions too
+
+
+            // Configure relationship between Transaction and Product
+            modelBuilder.Entity<Transaction>()
+                .HasOne(t => t.Product)
+                .WithMany()  // No navigation property back to transactions in Product
+                .HasForeignKey(t => t.ProductID)
+                .OnDelete(DeleteBehavior.Restrict);  // Don't delete products when transactions are deleted
+
+            // Ensure precision for money fields
+            modelBuilder.Entity<Transaction>()
+                .Property(t => t.TotalCHF)
+                .HasColumnType("decimal(18,2)");
+
+            modelBuilder.Entity<Transaction>()
+                .Property(t => t.TotalQuotaCHF)
+                .HasColumnType("decimal(18,2)");
+        
             // Set precision for PricePerUnit field in Product (important for money values)
             modelBuilder.Entity<Product>()
                 .Property(p => p.PricePerUnit)
                 .HasColumnType("decimal(18,2)"); // 18 total digits, 2 after decimal
+
+
         }
     }
 }

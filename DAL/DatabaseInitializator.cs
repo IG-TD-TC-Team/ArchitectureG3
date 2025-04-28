@@ -11,7 +11,7 @@ namespace DAL
     public static class DatabaseInitializator
     {
         /// <summary>
-        /// Seeds the database with initial products and users.
+        /// Seeds the database with initial products, users, and sample transactions.
         /// </summary>
         /// <param name="context">The database context used for accessing entities.</param>
         public static void SeedData(PrintingSystemContext context)
@@ -23,6 +23,9 @@ namespace DAL
 
                 // Seed initial users
                 SeedUsers(context);
+
+                // Seed sample transactions
+                SeedTransactions(context);
             }
             catch (Exception ex)
             {
@@ -34,46 +37,39 @@ namespace DAL
         }
 
         /// <summary>
-        /// Seeds predefined printing products into the database if they don't already exist.
+        /// Seeds only the A4 Black and White product into the database if it doesn't already exist.
         /// </summary>
         private static void SeedProducts(PrintingSystemContext context)
         {
-            // Check if the basic A4 Black and White product exists
-            if (!context.Products.Any(p => p.Name == "A4_BW"))
+            try
             {
-                // If not, add a default product (likely a placeholder)
-                context.Products.Add(new Product());
-                context.SaveChanges();
-            }
-
-            // Define additional product configurations
-            var additionalProducts = new[]
-            {
-                new { Name = "A4_Color", Description = "A4 Color Print", Price = 0.25M, Color = true, Size = "A4", Type = "StandardPaper" },
-                new { Name = "A3_BW", Description = "A3 Black and White", Price = 0.2M, Color = false, Size = "A3", Type = "StandardPaper" },
-                new { Name = "A3_Color", Description = "A3 Color Print", Price = 0.5M, Color = true, Size = "A3", Type = "StandardPaper" }
-            };
-
-            // Add each additional product only if it doesn't already exist
-            foreach (var prod in additionalProducts)
-            {
-                if (!context.Products.Any(p => p.Name == prod.Name))
+                // Check if any A4_BW product already exists
+                if (!context.Products.Any(p => p.Name == "A4_BW"))
                 {
-                    // Create a new Product using a constructor that automatically sets derived fields
-                    var product = new Product(
-                        prod.Name,
-                        prod.Description,
-                        prod.Price,
-                        prod.Color,
-                        prod.Size,  // Maps to PaperSize enum or property
-                        prod.Type   // Maps to PaperType enum or property
-                    );
+                    Console.WriteLine("Adding A4 Black and White product to database...");
 
-                    context.Products.Add(product);
+                    // Create the default A4 B/W product
+                    // The parameterless constructor creates an A4_BW product with default values
+                    var a4bwProduct = new Product();
+
+                    // Add it to the context
+                    context.Products.Add(a4bwProduct);
+
+                    // Save changes to the database
+                    context.SaveChanges();
+
+                    Console.WriteLine("A4 Black and White product added successfully.");
+                }
+                else
+                {
+                    Console.WriteLine("A4 Black and White product already exists in database.");
                 }
             }
-
-            context.SaveChanges(); // Persist all changes
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error seeding A4 Black and White product: {ex.Message}");
+                throw; // Re-throw to be caught by the main SeedData method
+            }
         }
 
         /// <summary>
@@ -85,8 +81,8 @@ namespace DAL
             var usersToSeed = new[]
             {
                 new { FirstName = "Tatiana", LastName = "Da Costa", Password = "AdminHevs01" },
-                new { FirstName = "Julio", LastName = "Cortès", Password = "AdminHevs01" },
-                new { FirstName = "Sofia", LastName = "Cortès", Password = "AdminHevs01" }
+                new { FirstName = "Julio", LastName = "Cortés", Password = "AdminHevs01" },
+                new { FirstName = "Sofia", LastName = "Cortés", Password = "AdminHevs01" }
             };
 
             // Check if user already exists, and add if not
@@ -110,6 +106,56 @@ namespace DAL
             }
         }
 
+        /// <summary>
+        /// Seeds sample printing transactions into the database.
+        /// </summary>
+        private static void SeedTransactions(PrintingSystemContext context)
+        {
+            // Skip if transactions exist
+            if (context.Transactions.Any())
+                return;
+
+            // Get users and the default A4 B/W product
+            var users = context.Users.ToList();
+            var product = context.Products.FirstOrDefault(p => p.Name == "A4_BW");
+
+            if (!users.Any() || product == null)
+            {
+                Console.WriteLine("Cannot seed transactions: Users or product missing");
+                return;
+            }
+
+            var random = new Random(42);
+
+            foreach (var user in users)
+            {
+                int transactionCount = random.Next(1, 4);
+
+                for (int i = 0; i < transactionCount; i++)
+                {
+                    int pageCount = random.Next(1, 51);
+
+                    // Create transaction with product
+                    var transaction = new Transaction(user.UserID, pageCount, product)
+                    {
+                        Date = DateTime.UtcNow.AddDays(-random.Next(0, 30)),
+                        User = user  // Set user reference for applying balance changes
+                    };
+
+                    // Apply costs to user balance
+                    transaction.ApplyToUserBalance();
+
+                    context.Transactions.Add(transaction);
+                }
+            }
+
+            context.SaveChanges();
+            Console.WriteLine($"Added {context.Transactions.Count()} sample transactions");
+        }
+
+        /**
+         * CALCULATION HAVE TO ME MOVED TO THE BUSINESS LAYER
+         */
         /// <summary>
         /// Generates a unique username based on the first and last name.
         /// The base username is composed of the first 3 letters of each name.
