@@ -23,7 +23,7 @@ namespace DAL.Models
         /// <param name="lastName">User's last name.</param>
         /// <param name="password">Password for authentication (should be hashed in production).</param>
         /// <param name="username">Unique username for login.</param>
-        public User(string firstName, string lastName, string password, string username)
+        public User(string firstName, string lastName, string password, string username, string group)
         {
             UserID = Guid.NewGuid();                  // Generate a unique user ID
             FirstName = firstName;
@@ -35,7 +35,8 @@ namespace DAL.Models
 
             Transactions = new List<Transaction>();   // Initialize the collection of transactions
 
-            
+            Group = group;
+
             // Initialize account values
             CopyQuota = 0;                            // Number of copies available
             CHF = 0m;                                 // Monetary balance
@@ -69,6 +70,11 @@ namespace DAL.Models
         /// Password used for authentication.
         /// </summary>
         public string Password { get; set; }
+
+        /// <summary>
+        /// User group (e.g., student, staff, etc.)
+        /// </summary>
+        public string Group { get; set; } 
 
         /// <summary>
         /// The card associated with the user.

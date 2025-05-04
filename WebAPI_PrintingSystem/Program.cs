@@ -17,8 +17,9 @@ namespace WebAPI_PrintingSystem
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
-            builder.Services.AddScoped<IAuthentificationHelper, AuthentificationHelper>();
-            
+            builder.Services.AddScoped<IAuthentificationHelper, AuthenticationHelper>();
+            builder.Services.AddScoped<IBalanceHelper, BalanceHelper>();
+
             // Register the database context with dependency injection
             builder.Services.AddDbContext<PrintingSystemContext>(options =>
                 options.UseSqlServer(@"Server=(localdb)\mssqllocaldb;Database=PrintingSystemDB;Trusted_Connection=True"));
