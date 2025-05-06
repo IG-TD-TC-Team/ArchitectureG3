@@ -15,20 +15,7 @@ namespace WebAPI_PrintingSystem.Controllers
             _balanceHelper = balanceHelper;
         }
 
-        [HttpGet("getUIDByUsername")]
-        public async Task<ActionResult<Guid>> GetUIDByUsername(string username)
-        {
-            try
-            {
-                var userID = await _balanceHelper.getUIDByUsername(username);
-                return Ok(userID);
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, new { message = "An error occurred while retrieving the user ID.", error = ex.Message });
-            }
-        }
-
+       
         [HttpPost("creditUIDWithQuotaCHF")]
         public async Task<ActionResult<(decimal, int, bool)>> CreditUIDWithQuotaCHF(Guid userID, decimal quotaCHF)
         {
@@ -56,7 +43,7 @@ namespace WebAPI_PrintingSystem.Controllers
                 var result = await _balanceHelper.creditUsernameWithQuotaCHF(username, quotaCHF);
                 return Ok(new
                 {
-                    NewQuotaCHFCharged = result.Item1,
+                    QuotaCHFCharged = result.Item1,
                     Done = result.Item2
                 });
             }

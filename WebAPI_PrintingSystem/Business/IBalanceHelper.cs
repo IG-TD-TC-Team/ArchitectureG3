@@ -7,11 +7,6 @@ namespace WebAPI_PrintingSystem.Business
 
 
         //-----------Exposed Methods------------------
-        /// <summary>
-        /// Gets user ID by username (IMO This method should be at the Auth API because we are working with
-        /// the object user and its existence)
-        /// </summary>
-        Task<Guid> getUIDByUsername(string username);
 
         /// <summary>
         /// Retrieves the current quota balance in CHF

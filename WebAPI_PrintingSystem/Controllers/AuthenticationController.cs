@@ -16,15 +16,18 @@ namespace WebAPI_PrintingSystem.Controllers
             _authentificationHelper = authentificationHelper;
         }
 
-        [HttpGet]
-        public async Task<ActionResult<IEnumerable<User>>> GetUsers()
+        [HttpGet("retrieveUIDByUsername")]
+        public async Task<ActionResult<Guid>> RetrieveUIDByUsername(string username)
         {
-            var users = await _authentificationHelper.GetUsers();
-            if (users == null || !users.Any())
+            try
             {
-                return NotFound("No users found.");
+                var userID = await _authentificationHelper.retrieveUIDByUsername(username);
+                return Ok(new { UserID = userID });
             }
-            return Ok(users);
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = "An error occurred while retrieving the user ID.", error = ex.Message });
+            }
         }
 
         [HttpPost("authenticateByCard")]
@@ -71,16 +74,23 @@ namespace WebAPI_PrintingSystem.Controllers
                     return BadRequest(new { message = "Username and password are required." });
                 }
 
-                var result = await _authentificationHelper.authenticateByUsername(request.Username, request.Password);
+                try
+                {
+                    var result = await _authentificationHelper.authenticateByUsername(request.Username, request.Password);
 
-                // Check if authentication was successful
-                if (result.Equals("Successfull access", StringComparison.OrdinalIgnoreCase))
-                {
-                    return Ok(new { message = result });
+                    // Check if authentication was successful
+                    if (result.Item1.ToLower().Contains("successful access"))
+                    {
+                        return Ok(new { message = result.Item1, UID = result.Item2 });
+                    }
+                    else
+                    {
+                        return Unauthorized(new { message = result.Item1 });
+                    }
                 }
-                else
+                catch (InvalidOperationException ex)
                 {
-                    return Unauthorized(new { message = result });
+                    return BadRequest(new { message = "An error occurred during authentication.", error = ex.Message });
                 }
             }
             catch (Exception ex)

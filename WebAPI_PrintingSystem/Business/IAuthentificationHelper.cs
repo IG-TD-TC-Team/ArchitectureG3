@@ -7,12 +7,6 @@ namespace WebAPI_PrintingSystem.Business
     {
     //-----------External Methods------------------
         /// <summary>
-        /// Retrieves all users from the database.
-        /// </summary>
-
-        Task<IEnumerable<User>> GetUsers();
-
-        /// <summary>
         /// Authenticates a user by their card ID
         /// </summary>
         Task<(string, Guid?)> authenticateByCard(Guid cardId);
@@ -20,7 +14,12 @@ namespace WebAPI_PrintingSystem.Business
         /// <summary>
         /// Authenticates a user by their username and password
         /// </summary>
-        Task<string> authenticateByUsername(string username, string password);
+        Task<(string, Guid?)> authenticateByUsername(string username, string password);
+
+        /// <summary>
+        /// Retrieves the user ID associated with a username
+        /// </summary>
+        Task<Guid> retrieveUIDByUsername(string username);
 
     //------------Internal Methods----------------
         /// <summary>
@@ -38,6 +37,14 @@ namespace WebAPI_PrintingSystem.Business
         ///  Retrieves the user ID associated with a card
         ///  </summary>
         Task<Guid> getUIDByCardID(Guid cardID);
+
+
+        /// <summary>
+        /// Retrieves the user ID associated with a username
+        /// </summary>
+        /// <param name="username"></param>
+        /// <returns></returns>
+        Task<Guid> getUIDByUsername(string username);
 
         /// <summary>
         /// Checks if a username exists

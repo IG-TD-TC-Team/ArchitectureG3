@@ -9,7 +9,7 @@ namespace WebAPI_PrintingSystem.Business
     public class BalanceHelper : IBalanceHelper
     {
         private readonly PrintingSystemContext _repo;
-        private readonly IAuthentificationHelper _authHelper; // ASK ALAIN
+        private readonly IAuthentificationHelper _authHelper;
 
         public BalanceHelper(PrintingSystemContext repo, IAuthentificationHelper authHelper)
         {
@@ -52,17 +52,6 @@ namespace WebAPI_PrintingSystem.Business
             return user.QuotaCHF;
         }
 
-        public async Task<Guid> getUIDByUsername(string username)
-        {
-            var user = await _repo.Users.FirstOrDefaultAsync(u => u.Username == username);
-
-            if (user == null)
-            {
-                throw new InvalidOperationException($"User with username {username} not found.");
-            }
-
-            return user.UserID;
-        }
 
         public async Task<bool> updateCopyQuotaByUID(Guid userID, int copyQuota)
         {
@@ -92,19 +81,19 @@ namespace WebAPI_PrintingSystem.Business
         public async Task<(decimal , int, bool )> creditUIDWithQuotaCHF(Guid userID, decimal quotaCHF)
         {
             decimal actualQuotaCHF = await getQuotaCHFByUID(userID);
-            decimal newQuotaCHF = additionQuotaCHF(quotaCHF, actualQuotaCHF);
-            await updateQuotaCHFByUID(userID, newQuotaCHF);
-            int copyQuota = convertQuotaCHFToCopyQuota(newQuotaCHF);
-            await updateCopyQuotaByUID(userID, copyQuota);
+            decimal NewQuotaCHF = additionQuotaCHF(quotaCHF, actualQuotaCHF);
+            bool resultUpdateQuotaCHF = await updateQuotaCHFByUID(userID, NewQuotaCHF);
+            int copyQuota = convertQuotaCHFToCopyQuota(NewQuotaCHF);
+            bool resultUpdateCopyQuota = await updateCopyQuotaByUID(userID, copyQuota);
 
-            return (newQuotaCHF,copyQuota, true);
+            return (NewQuotaCHF,copyQuota, true);
         }
 
         public async Task<(decimal ,bool )> creditUsernameWithQuotaCHF(string username, decimal quotaCHF)
         {
             if (await _authHelper.findByUsername(username))
             {
-                Guid userID = await getUIDByUsername(username);
+                Guid userID = await _authHelper.getUIDByUsername(username);
                 decimal actualQuotaCHF = await getQuotaCHFByUID(userID);
                 decimal newQuotaCHF = additionQuotaCHF(quotaCHF, actualQuotaCHF);
                 await updateQuotaCHFByUID(userID, newQuotaCHF);

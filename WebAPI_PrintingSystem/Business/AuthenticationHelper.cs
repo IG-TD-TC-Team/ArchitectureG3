@@ -18,7 +18,7 @@ namespace WebAPI_PrintingSystem.Business
             var card = await _repo.Cards
                 .Include(c => c.User)
                 .FirstOrDefaultAsync(u => u.CardID == cardID);
-            
+
             if (card != null && card.User != null)
             {
                 return true;
@@ -48,6 +48,34 @@ namespace WebAPI_PrintingSystem.Business
             if (card != null)
             {
                 return card.IsActive;
+            }
+            else
+            {
+                return false;
+            }
+        }
+
+        public async Task<bool> isUserActive(Guid cardID)
+        {
+            var card = await _repo.Cards
+                .Include(c => c.User)
+                .FirstOrDefaultAsync(u => u.CardID == cardID);
+            if (card != null && card.User != null)
+            {
+                return card.User.IsActive;
+            }
+            else
+            {
+                return false;
+            }
+        }
+
+        private async Task<bool> isUserActive(string username)
+        {
+            var user = await _repo.Users.FirstOrDefaultAsync(u => u.Username == username);
+            if (user != null)
+            {
+                return user.IsActive;
             }
             else
             {
@@ -90,25 +118,42 @@ namespace WebAPI_PrintingSystem.Business
             return userID;
         }
 
+        public async Task<Guid> getUIDByUsername(string username)
+        {
+            var user = await _repo.Users.FirstOrDefaultAsync(u => u.Username == username);
+
+            if (user == null)
+            {
+                throw new InvalidOperationException($"User with username {username} not found.");
+            }
+
+            return user.UserID;
+        }
+
 
         //--------- Exposed Methods------------------
 
-        public async Task<(string, Guid?)> authenticateByCard(Guid cardId) // Updated to match the interface signature
+        public async Task<(string, Guid?)> authenticateByCard(Guid cardId)
         {
-
-
             if (await findByCardID(cardId)) // Check if the card exists
             {
                 if (await isCardActive(cardId)) // Check if the card is active
                 {
-                    try
+                    if (await isUserActive(cardId)) // Check if the user is active
                     {
-                        var userId = await getUIDByCardID(cardId);
-                        return ("Successfull access", userId);
+                        try
+                        {
+                            var userId = await getUIDByCardID(cardId);
+                            return ("Successful access", userId);
+                        }
+                        catch (InvalidOperationException)
+                        {
+                            return ("Card has no associated user", null);
+                        }
                     }
-                    catch (InvalidOperationException)
+                    else
                     {
-                        return ("Card has no associated user", null);
+                        return ("User is not active", null);
                     }
                 }
                 else
@@ -122,27 +167,62 @@ namespace WebAPI_PrintingSystem.Business
             }
         }
 
-        public async Task<string> authenticateByUsername(string username, string password)
+
+        public async Task<(string, Guid?)> authenticateByUsername(string username, string password)
         {
-
-
             if (await findByUsername(username))
             {
-                if (await verifyPasswordWithUsername(username, password))
+                if (await isUserActive(username))
                 {
-                    return "Successfull access";
+                    if (await verifyPasswordWithUsername(username, password))
+                    {
+                        try
+                        {
+                            var userId = await getUIDByUsername(username);
+                            return ("Successful access", userId);
+                        }
+                        catch (InvalidOperationException)
+                        {
+                            return ("Username has no associated user ID", null);
+                        }
+                    }
+                    else
+                    {
+                        return ("Incorrect password", null);
+                    }
                 }
                 else
                 {
-                    return "Password incorrect";
+                    return ("User is not active", null);
                 }
             }
             else
             {
-                return "Username not found";
-
+                return ("Username not found", null);
             }
         }
+
+        public async Task <Guid> retrieveUIDByUsername(string username)
+        {
+            if (await findByUsername(username))
+            {
+                if (await isUserActive(username))
+                {
+                    var userId = await getUIDByUsername(username);
+                    return userId;
+                }
+                else
+                {
+                    throw new InvalidOperationException($"User with username {username} is not active.");
+                }
+
+            }
+            else
+            {
+                throw new InvalidOperationException($"User with username {username} not found.");
+            }
+        }
+
 
 
     }
