@@ -77,12 +77,12 @@ namespace DAL
         /// </summary>
         private static void SeedUsers(PrintingSystemContext context)
         {
-            // List of user info to add
+            // List of user info to add - now including the Group property
             var usersToSeed = new[]
             {
-                new { FirstName = "Tatiana", LastName = "Da Costa", Password = "AdminHevs01" },
-                new { FirstName = "Julio", LastName = "Cortés", Password = "AdminHevs01" },
-                new { FirstName = "Sofia", LastName = "Cortés", Password = "AdminHevs01" }
+                new { FirstName = "Tatiana", LastName = "Da Costa", Password = "AdminHevs01", Group = "staff" },
+                new { FirstName = "Julio", LastName = "Cortés", Password = "AdminHevs01", Group = "staff" },
+                new { FirstName = "Sofia", LastName = "Cortés", Password = "AdminHevs01", Group = "student" }
             };
 
             // Check if user already exists, and add if not
@@ -93,12 +93,13 @@ namespace DAL
                     // Generate a unique username to avoid duplicates
                     var username = GenerateUniqueUsername(context, user.FirstName, user.LastName);
 
-                    // Create and add the new user
+                    // Create and add the new user - updated constructor with group parameter
                     context.Users.Add(new User(
                         user.FirstName,
                         user.LastName,
                         user.Password,
-                        username
+                        username,
+                        user.Group  // Added the group parameter here
                     ));
 
                     context.SaveChanges(); // Save after each user
