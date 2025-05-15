@@ -9,6 +9,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DAL", "DAL\DAL.csproj", "{F
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WebAPI_PrintingSystem", "WebAPI_PrintingSystem\WebAPI_PrintingSystem.csproj", "{3E0D556C-9946-4B24-BDEB-13898B0EE128}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MVC_POS", "MVC_POS\MVC_POS.csproj", "{A67943A8-8671-4BCC-AAFC-9D4C7AAFC102}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MVC_Faculty", "MVC_Faculty\MVC_Faculty.csproj", "{E27BA286-227F-456F-9E8F-C378040B3918}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -27,6 +31,14 @@ Global
 		{3E0D556C-9946-4B24-BDEB-13898B0EE128}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{3E0D556C-9946-4B24-BDEB-13898B0EE128}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{3E0D556C-9946-4B24-BDEB-13898B0EE128}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A67943A8-8671-4BCC-AAFC-9D4C7AAFC102}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A67943A8-8671-4BCC-AAFC-9D4C7AAFC102}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A67943A8-8671-4BCC-AAFC-9D4C7AAFC102}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A67943A8-8671-4BCC-AAFC-9D4C7AAFC102}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E27BA286-227F-456F-9E8F-C378040B3918}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E27BA286-227F-456F-9E8F-C378040B3918}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E27BA286-227F-456F-9E8F-C378040B3918}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E27BA286-227F-456F-9E8F-C378040B3918}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
