@@ -18,20 +18,15 @@ namespace MVC_POS.Services
 
         public async Task<AuthenticationM> AuthenticateByCardAsync(Guid cardId)
         {
-            var url = _baseUrl + "/AuthenticationController";
+            var url = _baseUrl + "/api/Authentication/authenticateByCard";
             var payload = cardId;
-
-
             var json = JsonSerializer.Serialize(payload);
-
             var response = await _client.PostAsJsonAsync(url, json);
-
             if (response.IsSuccessStatusCode)
             {
                 var responseContent = await response.Content.ReadAsStringAsync();
-                return JsonSerializer.Deserialize<AuthentificationM>(responseContent);
+                return JsonSerializer.Deserialize<AuthenticationM>(responseContent);
             }
-
             throw new HttpRequestException($"Authentication failed with status code: {response.StatusCode}");
         }
     }
