@@ -2,6 +2,7 @@ using MVC_Faculties.Services;
 
 namespace MVC_Faculties;
 
+
 public class Program
 {
     public static void Main(string[] args)
