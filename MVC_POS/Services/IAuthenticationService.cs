@@ -2,7 +2,7 @@
 
 namespace MVC_POS.Services
 {
-    public class IAuthenticationService
+    public interface IAuthenticationService
     {
         Task<AuthenticationM> AuthenticateByCardAsync(Guid cardId);
     }

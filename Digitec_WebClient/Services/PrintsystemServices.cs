@@ -8,10 +8,10 @@ namespace MVC_Faculties.Services
         private readonly HttpClient _client;
         private readonly string _baseUrl = ""; //TODO: Add the base URL of the API
 
-        private PrintsystemServices(HttpClient client)
-        {
-            _client = client;
-        }
+            private PrintsystemServices(HttpClient client)
+            {
+                _client = client;
+            }
 
         public async Task<AuthentificationM> AuthenticateByUsername(AuthentificationM userAuth)
         {
