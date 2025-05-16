@@ -82,5 +82,17 @@ namespace DAL.Models
         /// </summary>
         public decimal TotalQuotaCHFInTransaction { get; set; }
 
+        public void ApplyToUserBalance()
+        {
+            if (User != null)
+            {
+                // Apply transaction totals to user balances
+                User.CopyQuota += TotalCopyQuotaInTransaction;
+                User.CHF += TotalCHFInTransaction;
+                User.QuotaCHF += TotalQuotaCHFInTransaction;
+            }
+        }
+
+
     }
 }

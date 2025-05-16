@@ -87,11 +87,11 @@ namespace DAL
 
             // Ensure precision for money fields
             modelBuilder.Entity<Transaction>()
-                .Property(t => t.TotalCHF)
+                .Property(t => t.TotalCHFInTransaction)
                 .HasColumnType("decimal(18,2)");
 
             modelBuilder.Entity<Transaction>()
-                .Property(t => t.TotalQuotaCHF)
+                .Property(t => t.TotalCopyQuotaInTransaction)
                 .HasColumnType("decimal(18,2)");
         
             // Set precision for PricePerUnit field in Product (important for money values)
