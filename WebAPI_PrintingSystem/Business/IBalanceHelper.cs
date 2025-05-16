@@ -43,7 +43,7 @@ namespace WebAPI_PrintingSystem.Business
         /// <summary>
         /// Updates quota balance in database
         /// </summary>
-        Task<bool> updateQuotaCHFByUID(Guid userID, decimal quotaCHF);
+        Task<decimal> updateQuotaCHFByUID(Guid userID, decimal quotaCHF);
 
         /// <summary>
         /// Converts CHF amount to copy quota
@@ -53,7 +53,7 @@ namespace WebAPI_PrintingSystem.Business
         /// <summary>
         /// Updates copy quota in database
         /// </summary>
-        Task<bool> updateCopyQuotaByUID(Guid userID, int copyQuota);
+        Task<int> updateCopyQuotaByUID(Guid userID, int copyQuota);
 
 
 

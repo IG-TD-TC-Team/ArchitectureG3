@@ -13,7 +13,7 @@ namespace WebAPI_PrintingSystem.Business
             _repo = repo;
         }
 
-        public async Task<bool> findByCardID(Guid cardID)
+        public async Task<bool> cardIDExists(Guid cardID)
         {
             var card = await _repo.Cards
                 .Include(c => c.User)
@@ -29,7 +29,7 @@ namespace WebAPI_PrintingSystem.Business
             }
         }
 
-        public async Task<bool> findByUsername(string username)
+        public async Task<bool> usernameExists(string username)
         {
             var user = await _repo.Users.FirstOrDefaultAsync(u => u.Username == username);
             if (user != null)
@@ -135,7 +135,7 @@ namespace WebAPI_PrintingSystem.Business
 
         public async Task<(string, Guid?)> authenticateByCard(Guid cardId)
         {
-            if (await findByCardID(cardId)) // Check if the card exists
+            if (await cardIDExists(cardId)) // Check if the card exists
             {
                 if (await isCardActive(cardId)) // Check if the card is active
                 {
@@ -170,7 +170,7 @@ namespace WebAPI_PrintingSystem.Business
 
         public async Task<(string, Guid?)> authenticateByUsername(string username, string password)
         {
-            if (await findByUsername(username))
+            if (await usernameExists(username))
             {
                 if (await isUserActive(username))
                 {
@@ -202,18 +202,19 @@ namespace WebAPI_PrintingSystem.Business
             }
         }
 
-        public async Task <Guid> retrieveUIDByUsername(string username)
+        public async Task <bool> checkUsername(string username)
         {
-            if (await findByUsername(username))
+            if (await usernameExists(username))
             {
                 if (await isUserActive(username))
                 {
-                    var userId = await getUIDByUsername(username);
-                    return userId;
+                    
+                    return true;
                 }
                 else
-                {
+                {   
                     throw new InvalidOperationException($"User with username {username} is not active.");
+                    
                 }
 
             }

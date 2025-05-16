@@ -19,13 +19,13 @@ namespace WebAPI_PrintingSystem.Business
         /// <summary>
         /// Retrieves the user ID associated with a username
         /// </summary>
-        Task<Guid> retrieveUIDByUsername(string username);
+        Task<bool> checkUsername(string username);
 
     //------------Internal Methods----------------
         /// <summary>
         /// Checks if a card exists in the database
         /// </summary>
-        Task<bool> findByCardID(Guid cardID);
+        Task<bool> cardIDExists(Guid cardID);
 
         /// <summary>
         /// Verifies if a card is currently active
@@ -49,7 +49,7 @@ namespace WebAPI_PrintingSystem.Business
         /// <summary>
         /// Checks if a username exists
         /// </summary>
-        Task<bool> findByUsername(string username);
+        Task<bool> usernameExists(string username);
 
         /// <summary>
         /// alidates password for a username
