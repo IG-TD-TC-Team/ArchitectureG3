@@ -49,7 +49,7 @@ namespace MVC_POS.Controllers
                     return View(card);
                 }
             }
-            catch (HttpRequestException ex)
+            catch (Exception ex)
             {
                 ModelState.AddModelError("", $"Authentication error: {ex.Message}");
                 return View(card);
@@ -66,13 +66,17 @@ namespace MVC_POS.Controllers
                 return RedirectToAction("Card");
             }
 
-            ViewBag.UserId = TempData["UserId"].ToString();
-            return View(new CreditViewModel { UserId = Guid.Parse(TempData["UserId"].ToString()) });
+            var model = new BalanceM
+            {
+                UserId = Guid.Parse(TempData["UserId"].ToString())
+            };
+
+            return View(model);
         }
 
         // POST: Authentication/AddCredit
         [HttpPost]
-        public async Task<IActionResult> AddCredit(CreditViewModel model)
+        public async Task<IActionResult> AddCredit(BalanceM model)
         {
             if (!ModelState.IsValid)
             {
@@ -91,7 +95,7 @@ namespace MVC_POS.Controllers
 
                 return RedirectToAction("Summary");
             }
-            catch (HttpRequestException ex)
+            catch (Exception ex)
             {
                 ModelState.AddModelError("", $"Error adding credit: {ex.Message}");
                 return View(model);
@@ -113,12 +117,4 @@ namespace MVC_POS.Controllers
             return View(model);
         }
     }
-
-    // View model for the credit form
-    public class CreditViewModel
-    {
-        public Guid UserId { get; set; }
-        public decimal Amount { get; set; }
-    }
-
 }

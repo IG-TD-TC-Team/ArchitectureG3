@@ -2,7 +2,6 @@
 using MVC_POS.Models;
 using MVC_POS.Services;
 using System;
-using System.ComponentModel.DataAnnotations;
 using System.Threading.Tasks;
 
 namespace MVC_POS.Controllers
@@ -26,9 +25,9 @@ namespace MVC_POS.Controllers
                 return RedirectToAction("Card", "Authentication");
             }
 
-            var model = new CreditViewModel
+            var model = new BalanceM
             {
-                UserId = userId  // Use the parameter, not this.userId
+                UserId = userId
             };
 
             return View(model);
@@ -36,7 +35,7 @@ namespace MVC_POS.Controllers
 
         // POST: Balance/CreditUser
         [HttpPost]
-        public async Task<IActionResult> CreditUser(CreditViewModel model)
+        public async Task<IActionResult> CreditUser(BalanceM model)
         {
             if (!ModelState.IsValid)
             {
