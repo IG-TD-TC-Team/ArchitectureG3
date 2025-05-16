@@ -4,7 +4,7 @@ using System.Net.Http.Json;
 
 namespace MVC_POS.Services
 {
-    public class BalanceService
+    public class BalanceService : IBalanceService
     {
         private readonly HttpClient _client;
         private readonly string _baseUrl = ""; //TODO: Add the base URL of the API
@@ -15,7 +15,7 @@ namespace MVC_POS.Services
 
         public async Task<UserM> CreditUserWithQuotaCHFAsync(Guid userId, decimal quotaCHF)
         {
-            var url = _baseUrl + "/BalanceController";
+            var url = _baseUrl + "/creditUIDWithQuotaCHF";
             var payload = new { UserID = userId, QuotaCHF = quotaCHF };
             var json = JsonSerializer.Serialize(payload);
             var response = await _client.PostAsJsonAsync(url, json);
