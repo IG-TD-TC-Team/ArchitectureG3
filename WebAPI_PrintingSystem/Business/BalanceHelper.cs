@@ -53,28 +53,30 @@ namespace WebAPI_PrintingSystem.Business
         }
 
 
-        public async Task<bool> updateCopyQuotaByUID(Guid userID, int copyQuota)
+        public async Task<int> updateCopyQuotaByUID(Guid userID, int copyQuota)
         {
             var user = await _repo.Users.FirstOrDefaultAsync(u => u.UserID == userID);
             if (user != null)
             {
                 user.CopyQuota = copyQuota;
                 await _repo.SaveChangesAsync();
-                return true;
+                var savedCopyQuota = user.CopyQuota; 
+                return savedCopyQuota; ///Changes: Return the updatedQuota that will bi writed in the DB
             }
-            return false;
+            return 0;
         }
 
-        public async Task<bool> updateQuotaCHFByUID(Guid userID, decimal quotaCHF)
+        public async Task<decimal> updateQuotaCHFByUID(Guid userID, decimal quotaCHF)
         {
             var user = await _repo.Users.FirstOrDefaultAsync(u => u.UserID == userID);
             if (user != null)
             {
                 user.QuotaCHF = quotaCHF;
                 await _repo.SaveChangesAsync();
-                return true;
+                var savedQuotaCHF = user.QuotaCHF;
+                return savedQuotaCHF; ///Changes: Return the updatedQuota that will bi writed in the DB
             }
-            return false;
+            return 0;
         }
 
         //--------------Exposed Methods----------------
@@ -82,23 +84,24 @@ namespace WebAPI_PrintingSystem.Business
         {
             decimal actualQuotaCHF = await getQuotaCHFByUID(userID);
             decimal NewQuotaCHF = additionQuotaCHF(quotaCHF, actualQuotaCHF);
-            bool resultUpdateQuotaCHF = await updateQuotaCHFByUID(userID, NewQuotaCHF);
+            decimal resultUpdateQuotaCHF = await updateQuotaCHFByUID(userID, NewQuotaCHF);
             int copyQuota = convertQuotaCHFToCopyQuota(NewQuotaCHF);
-            bool resultUpdateCopyQuota = await updateCopyQuotaByUID(userID, copyQuota);
+            int resultUpdateCopyQuota = await updateCopyQuotaByUID(userID, copyQuota);
 
             return (NewQuotaCHF,copyQuota, true);
         }
 
         public async Task<(decimal ,bool )> creditUsernameWithQuotaCHF(string username, decimal quotaCHF)
         {
-            if (await _authHelper.findByUsername(username))
+            if (await _authHelper.usernameExists(username))
             {
-                Guid userID = await _authHelper.getUIDByUsername(username);
-                decimal actualQuotaCHF = await getQuotaCHFByUID(userID);
-                decimal newQuotaCHF = additionQuotaCHF(quotaCHF, actualQuotaCHF);
-                await updateQuotaCHFByUID(userID, newQuotaCHF);
+                Guid userID = await _authHelper.getUIDByUsername(username); //check username
+                decimal actualQuotaCHF = await getQuotaCHFByUID(userID); // get by username
+                decimal newQuotaCHF = additionQuotaCHF(quotaCHF, actualQuotaCHF); 
+                await updateQuotaCHFByUID(userID, newQuotaCHF); // by username
                 int copyQuota = convertQuotaCHFToCopyQuota(newQuotaCHF);
-                await updateCopyQuotaByUID(userID, copyQuota);
+                await updateCopyQuotaByUID(userID, copyQuota); // by username
+                
                 return (quotaCHF ,true);
             }
             else

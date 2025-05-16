@@ -16,17 +16,19 @@ namespace WebAPI_PrintingSystem.Controllers
             _authentificationHelper = authentificationHelper;
         }
 
-        [HttpGet("retrieveUIDByUsername")]
-        public async Task<ActionResult<Guid>> RetrieveUIDByUsername(string username)
+        [HttpGet("checkUsername")]
+        public async Task<ActionResult<Guid>> checkUsername(string username)
         {
             try
             {
-                var userID = await _authentificationHelper.retrieveUIDByUsername(username);
-                return Ok(new { UserID = userID });
+
+                bool result = await _authentificationHelper.checkUsername(username);
+                return Ok(new { exists = result});
+                
             }
             catch (Exception ex)
             {
-                return StatusCode(500, new { message = "An error occurred while retrieving the user ID.", error = ex.Message });
+                return StatusCode(500, new { message = "An error occurred while checking the username.", error = ex.Message });
             }
         }
 
@@ -95,7 +97,6 @@ namespace WebAPI_PrintingSystem.Controllers
             }
             catch (Exception ex)
             {
-                // Log the exception if you have logging in place
                 return StatusCode(500, new { message = "An error occurred during authentication.", error = ex.Message });
             }
         }

@@ -27,25 +27,6 @@ namespace DAL.Models
             Product = product;
             ProductID = product.ProductID;  // Set the foreign key
 
-
-        /**
-        * CALCULATION HAVE TO ME MOVED TO THE BUSINESS LAYER
-        */
-
-            // Set totals based on page count
-            TotalCopyQuota = pageCount;
-
-            // Set totals based on page count and product properties
-            TotalCopyQuota = (int)(pageCount * product.PrintQuotaCost); 
-
-            // For monetary calculations
-            TotalCHF = pageCount * product.PricePerUnit;
-
-            // Set total quota in CHF           
-            TotalQuotaCHF = TotalCHF;
-        /**
-        * CALCULATION HAVE TO ME MOVED TO THE BUSINESS LAYER
-        */
         }
 
         /// <summary>
@@ -83,34 +64,23 @@ namespace DAL.Models
         public Product Product { get; set; }
 
         // ───── Transaction Totals ─────
+        //Can be positive if adding quota, negative if subtracting quota
+
 
         /// <summary>
         /// Total printing quota used in this transaction (equals page count for B/W).
         /// </summary>
-        public int TotalCopyQuota { get; set; }
+        public int TotalCopyQuotaInTransaction { get; set; }
 
         /// <summary>
         /// Total monetary amount (CHF) for this transaction.
         /// </summary>
-        public decimal TotalCHF { get; set; }
+        public decimal TotalCHFInTransaction { get; set; }
 
         /// <summary>
         /// Total quota value in CHF for this transaction.
         /// </summary>
-        public decimal TotalQuotaCHF { get; set; }
+        public decimal TotalQuotaCHFInTransaction { get; set; }
 
-        /// <summary>
-        /// Applies the transaction effects to the linked user's balance.
-        /// </summary>
-        public void ApplyToUserBalance()
-        {
-            if (User != null)
-            {
-                // Deduct costs from user's account
-                User.CopyQuota -= TotalCopyQuota;
-                User.CHF -= TotalCHF;
-                User.QuotaCHF -= TotalQuotaCHF;
-            }
-        }
     }
 }

@@ -9,6 +9,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DAL", "DAL\DAL.csproj", "{F
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WebAPI_PrintingSystem", "WebAPI_PrintingSystem\WebAPI_PrintingSystem.csproj", "{3E0D556C-9946-4B24-BDEB-13898B0EE128}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MVC_Faculties", "Digitec_WebClient\MVC_Faculties.csproj", "{F14DBF4C-8B4F-473F-9EEE-9530041B1089}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -27,6 +29,10 @@ Global
 		{3E0D556C-9946-4B24-BDEB-13898B0EE128}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{3E0D556C-9946-4B24-BDEB-13898B0EE128}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{3E0D556C-9946-4B24-BDEB-13898B0EE128}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F14DBF4C-8B4F-473F-9EEE-9530041B1089}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F14DBF4C-8B4F-473F-9EEE-9530041B1089}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F14DBF4C-8B4F-473F-9EEE-9530041B1089}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F14DBF4C-8B4F-473F-9EEE-9530041B1089}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
