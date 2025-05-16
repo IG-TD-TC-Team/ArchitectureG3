@@ -1,0 +1,41 @@
+﻿@model MVC_POS.Models.UserM
+
+@{
+    ViewData["Title"] = "User Balance";
+}
+
+<div class="row">
+    <div class="col-md-6 mx-auto">
+        <div class="card">
+            <div class="card-header bg-primary text-white">
+                <h4>Balance Information</h4>
+            </div>
+            <div class="card-body">
+                <div class="user-info mb-4">
+                    <h5>@(Model.FirstName ?? "") @(Model.LastName ?? "")</h5>
+                    @if (!string.IsNullOrEmpty(Model.Username))
+                    {
+                        <p class="text-muted">Username: @Model.Username</p>
+                    }
+                </div>
+
+                <div class="card mb-3 bg-light">
+                    <div class="card-body">
+                        <h6 class="card-title">Current Balance</h6>
+                        <dl class="row">
+                            <dt class="col-sm-6">CHF Balance:</dt>
+                            <dd class="col-sm-6">@Model.QuotaCHF.ToString("C")</dd>
+
+                            <dt class="col-sm-6">Copy Quota:</dt>
+                            <dd class="col-sm-6">@Model.CopyQuota pages</dd>
+                        </dl>
+                    </div>
+                </div>
+            </div>
+            <div class="card-footer text-center">
+                <a asp-action="CreditUser" asp-route-userId="@Model.UID" class="btn btn-success">Add Credit</a>
+                <a asp-controller="Home" asp-action="Index" class="btn btn-secondary">Return to Home</a>
+            </div>
+        </div>
+    </div>
+</div>

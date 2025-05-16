@@ -5,5 +5,6 @@ namespace MVC_POS.Services
     public interface IBalanceService
     {
         Task<UserM> CreditUserWithQuotaCHFAsync(Guid userId, decimal quotaCHF);
+        Task<UserM> GetUserBalanceAsync(Guid userId);
     }
 }

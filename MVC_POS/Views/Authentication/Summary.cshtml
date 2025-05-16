@@ -1,0 +1,37 @@
+﻿@model MVC_POS.Models.UserM
+
+@{
+    ViewData["Title"] = "Transaction Summary";
+}
+
+<div class="row">
+    <div class="col-md-6 mx-auto">
+        <div class="card">
+            <div class="card-header bg-success text-white">
+                <h4>Transaction Complete</h4>
+            </div>
+            <div class="card-body">
+                <div class="alert alert-success">
+                    <i class="fas fa-check-circle"></i> Credit has been successfully added to the account.
+                </div>
+
+                <h5 class="mt-4">Updated Account Information</h5>
+
+                <dl class="row mt-3">
+                    <dt class="col-sm-6">User:</dt>
+                    <dd class="col-sm-6">@(Model.FirstName ?? "") @(Model.LastName ?? "")</dd>
+
+                    <dt class="col-sm-6">CHF Balance:</dt>
+                    <dd class="col-sm-6">@Model.QuotaCHF.ToString("C")</dd>
+
+                    <dt class="col-sm-6">Copy Quota:</dt>
+                    <dd class="col-sm-6">@Model.CopyQuota pages</dd>
+                </dl>
+            </div>
+            <div class="card-footer text-center">
+                <a asp-controller="Home" asp-action="Index" class="btn btn-primary">Return to Home</a>
+                <a asp-action="Card" class="btn btn-success">Add Credit for Another User</a>
+            </div>
+        </div>
+    </div>
+</div>
