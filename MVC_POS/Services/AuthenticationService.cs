@@ -9,7 +9,7 @@ namespace MVC_POS.Services
     public class AuthenticationService : IAuthenticationService
     {
         private readonly HttpClient _client;
-        private readonly string _baseUrl = ""; //TODO: Add the base URL of the API
+        private readonly string _baseUrl = "https://localhost:7101"; //TODO: Add the base URL of the API
 
         public AuthenticationService(HttpClient client)
         {

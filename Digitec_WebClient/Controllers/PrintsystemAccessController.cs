@@ -13,6 +13,13 @@ namespace MVC_Faculties.Controllers
             _printServices = printServices;
         }
 
+        //----------------------INDEX-----------------------------------//
+        [HttpGet]
+        public async Task<IActionResult> Index()
+        {
+            
+            return View(); 
+        }
 
         //----------------------Authentification------------------------//
         [HttpGet]

@@ -1,3 +1,5 @@
+using MVC_POS.Services;
+
 namespace MVC_POS
 {
     public class Program
@@ -8,6 +10,8 @@ namespace MVC_POS
 
             // Add services to the container.
             builder.Services.AddControllersWithViews();
+            builder.Services.AddHttpClient<IAuthenticationService, AuthenticationService>();
+            builder.Services.AddHttpClient<IBalanceService, BalanceService>();
 
             var app = builder.Build();
 

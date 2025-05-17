@@ -6,9 +6,9 @@ namespace MVC_Faculties.Services
     public class PrintsystemServices : IPrintsystemServices
     {
         private readonly HttpClient _client;
-        private readonly string _baseUrl = ""; //TODO: Add the base URL of the API
+        private readonly string _baseUrl = "https://localhost:7101"; //TODO: Add the base URL of the API
 
-            private PrintsystemServices(HttpClient client)
+            public PrintsystemServices(HttpClient client)
             {
                 _client = client;
             }
