@@ -1,0 +1,13 @@
+@startuml
+class AuthenticationAccessController {
+    + AuthenticationAccessController(authService:IAuthenticationService, balanceService:IBalanceService)
+    + Card() : IActionResult
+    + <<async>> Card(card:CardM) : Task<IActionResult>
+    + AddCredit() : IActionResult
+    + <<async>> AddCredit(model:BalanceM) : Task<IActionResult>
+    + Summary() : IActionResult
+}
+Controller <|-- AuthenticationAccessController
+AuthenticationAccessController --> "_authService" IAuthenticationService
+AuthenticationAccessController --> "_balanceService" IBalanceService
+@enduml

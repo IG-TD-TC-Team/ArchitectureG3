@@ -1,0 +1,19 @@
+@startuml
+class AuthenticationHelper {
+    + AuthenticationHelper(repo:PrintingSystemContext)
+    + <<async>> cardIDExists(cardID:Guid) : Task<bool>
+    + <<async>> usernameExists(username:string) : Task<bool>
+    + <<async>> isCardActive(cardID:Guid) : Task<bool>
+    + <<async>> isUserActive(cardID:Guid) : Task<bool>
+    - <<async>> isUserActive(username:string) : Task<bool>
+    + <<async>> verifyPasswordWithUsername(username:string, password:string) : Task<bool>
+    + <<async>> GetUsers() : Task<IEnumerable<User>>
+    + <<async>> getUIDByCardID(cardID:Guid) : Task<Guid>
+    + <<async>> getUIDByUsername(username:string) : Task<Guid>
+    + <<async>> authenticateByCard(cardId:Guid) : Task<(string, Guid?)>
+    + <<async>> authenticateByUsername(username:string, password:string) : Task<(string, Guid?)>
+    + <<async>> checkUsername(username:string) : Task <bool>
+}
+IAuthentificationHelper <|-- AuthenticationHelper
+AuthenticationHelper --> "_repo" PrintingSystemContext
+@enduml

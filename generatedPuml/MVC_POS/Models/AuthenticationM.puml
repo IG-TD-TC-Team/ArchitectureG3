@@ -1,0 +1,7 @@
+@startuml
+class AuthenticationM {
+    + Message : string <<get>> <<set>>
+    + IsSuccessful : bool <<get>>
+}
+AuthenticationM --> "UID" Guid
+@enduml

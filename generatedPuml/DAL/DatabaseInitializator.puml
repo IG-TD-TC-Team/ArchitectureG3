@@ -1,0 +1,9 @@
+@startuml
+class DatabaseInitializator <<static>> {
+    + {static} SeedData(context:PrintingSystemContext) : void
+    - {static} SeedProducts(context:PrintingSystemContext) : void
+    - {static} SeedUsers(context:PrintingSystemContext) : void
+    - {static} SeedTransactions(context:PrintingSystemContext) : void
+    - {static} GenerateUniqueUsername(context:PrintingSystemContext, firstName:string, lastName:string) : string
+}
+@enduml

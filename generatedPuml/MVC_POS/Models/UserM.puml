@@ -1,0 +1,10 @@
+@startuml
+class UserM {
+    + Username : string? <<get>> <<set>>
+    + FirstName : string? <<get>> <<set>>
+    + LastName : string? <<get>> <<set>>
+    + QuotaCHF : decimal <<get>> <<set>>
+    + CopyQuota : int <<get>> <<set>>
+}
+UserM --> "UID" Guid
+@enduml
