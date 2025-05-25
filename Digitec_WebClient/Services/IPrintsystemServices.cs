@@ -6,6 +6,6 @@ namespace MVC_Faculties.Services
     {
         Task<AuthentificationM> AuthenticateByUsername(AuthentificationM userAuth);
 
-        Task<UserM> creditUsernameWithQuotaCHF(UserM user);
+        Task<UserM> creditUsernameWithQuotaCHF(UserM quotaRequest);
     }
 }

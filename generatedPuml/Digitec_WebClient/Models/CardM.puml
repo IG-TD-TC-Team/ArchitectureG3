@@ -1,0 +1,6 @@
+@startuml
+class CardM {
+}
+CardM --> "CardId" Guid
+CardM --> "UserId" Guid
+@enduml

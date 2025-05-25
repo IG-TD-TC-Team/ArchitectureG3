@@ -4,10 +4,52 @@
 
 <div class="text-center">
     <h1 class="display-4">Welcome to the Printing System</h1>
-    <p>Please select an option below:</p>
+    <p class="lead">Manage your printing quota and access printing services</p>
+
+    @if (TempData["ErrorMessage"] != null)
+    {
+        <div class="alert alert-danger">
+            @TempData["ErrorMessage"]
+        </div>
+    }
+
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success">
+            @TempData["SuccessMessage"]
+        </div>
+    }
+
+    <div class="row mt-5">
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Staff & Faculty Portal</h5>
+                    <p class="card-text">Login with your username and password to add quota to user accounts.</p>
+                    <a asp-action="AuthenticateByUsername" class="btn btn-primary">
+                        <i class="fas fa-user"></i> Login with Username
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Quick Actions</h5>
+                    <p class="card-text">Access other printing system features and services.</p>
+                    <div class="d-grid gap-2">
+                        <a href="#" class="btn btn-outline-secondary disabled">View Print History</a>
+                        <a href="#" class="btn btn-outline-secondary disabled">Check Printer Status</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 
     <div class="mt-4">
-        <a asp-action="AuthenticateByUsername" class="btn btn-primary">Log in with Username</a>
-        <a asp-action="creditUsernameWithQuotaCHF" class="btn btn-success">Add Credit to Account</a>
+        <small class="text-muted">
+            For technical support, please contact the IT helpdesk.
+        </small>
     </div>
 </div>

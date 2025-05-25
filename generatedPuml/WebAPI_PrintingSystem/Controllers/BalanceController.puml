@@ -1,0 +1,9 @@
+@startuml
+class BalanceController {
+    + BalanceController(balanceHelper:IBalanceHelper)
+    + <<async>> CreditUIDWithQuotaCHF(userID:Guid, quotaCHF:decimal) : Task<ActionResult<(decimal, int, bool)>>
+    + <<async>> CreditUsernameWithQuotaCHF(username:string, quotaCHF:decimal) : Task<ActionResult<(decimal, bool)>>
+}
+ControllerBase <|-- BalanceController
+BalanceController --> "_balanceHelper" IBalanceHelper
+@enduml

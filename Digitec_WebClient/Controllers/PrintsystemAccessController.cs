@@ -1,5 +1,6 @@
 ﻿using Digitec_WebClient.Models;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.ModelBinding;
 using MVC_Faculties.Services;
 
 namespace MVC_Faculties.Controllers
@@ -26,32 +27,108 @@ namespace MVC_Faculties.Controllers
         public async Task<IActionResult> AuthenticateByUsername()
         {
             //Step0
-            return View();
+            return View(new AuthentificationM());
         }
 
         [HttpPost]
         public async Task<IActionResult> AuthenticateByUsername(AuthentificationM userAuth)
         {
             //Step1
-            var auth = await _printServices.AuthenticateByUsername(userAuth);
-            return View(userAuth);
+
+            if (!ModelState.IsValid)
+            {
+                return View(userAuth);
+            }
+
+            try
+            {
+                var authResponse = await _printServices.AuthenticateByUsername(userAuth);
+
+                if (authResponse.IsSuccessful)
+                {
+                    // Store the user info in TempData for the next view
+                    TempData["UID"] = authResponse.UID.ToString();
+                    TempData["Username"] = userAuth.Username;
+                    TempData["SuccessMessage"] = authResponse.Message;
+
+                    // Redirect to the AddQuotaByUsername view
+                    return RedirectToAction("AddQuotaByUsername");
+                }
+                else
+                {
+                    // Authentication failed, show error message
+                    ModelState.AddModelError("", (authResponse.Message));
+                    return View(userAuth);
+                }
+            }
+            catch (Exception ex)
+            {
+                ModelState.AddModelError("", $"Authentication error: {ex.Message}");
+                return View(userAuth);
+            }
 
         }
 
-        //------------------------AddCredits-----------------------------//
+        //------------------------AddQuotaByUsername-----------------------------//
         [HttpGet]
-        public async Task<IActionResult> creditUsernameWithQuotaCHF()
+        public IActionResult AddQuotaByUsername()
         {
-            //Step0
-            return View();
+            // Check if we have user info from authentication
+            if (TempData["UID"] == null || TempData["Username"] == null)
+            {
+                TempData["ErrorMessage"] = "Please authenticate first.";
+                return RedirectToAction("AuthenticateByUsername");
+            }
+
+            var model = new UserM
+            {
+                UserID = Guid.Parse(TempData["UID"].ToString()),
+                Username = TempData["Username"].ToString()
+            };
+
+            // Keep the data for the POST request
+            TempData.Keep("UID");
+            TempData.Keep("Username");
+
+            ViewBag.SuccessMessage = TempData["SuccessMessage"];
+
+            return View(model);
         }
 
         [HttpPost]
-        public async Task<IActionResult> creditUsernameWithQuotaCHF(UserM user)
+        public async Task<IActionResult> AddQuotaByUsername(UserM quotaRequest)
         {
-            var creditAddedToUser = await _printServices.creditUsernameWithQuotaCHF(user);
-            return View(creditAddedToUser);
+            if (!ModelState.IsValid)
+            {
+                return View(quotaRequest);
+            }
+
+            try
+            {
+                var result = await _printServices.creditUsernameWithQuotaCHF(quotaRequest);
+
+                // Show success message
+                TempData["SuccessMessage"] = $"Successfully added {quotaRequest.QuotaCHF:C} CHF to {quotaRequest.Username}'s account.";
+
+                // Redirect back to the same view to allow adding more credit or go to index
+                return RedirectToAction("QuotaAddedSuccess", new { username = quotaRequest.Username, amount = quotaRequest.QuotaCHF });
+            }
+            catch (Exception ex)
+            {
+                ModelState.AddModelError("", $"Error adding quota: {ex.Message}");
+                return View(quotaRequest);
+            }
         }
+
+        //------------------------Success Page-----------------------------//
+        [HttpGet]
+        public IActionResult QuotaAddedSuccess(string username, decimal amount)
+        {
+            ViewBag.Username = username;
+            ViewBag.Amount = amount;
+            return View();
+        }
+
 
     }
 }

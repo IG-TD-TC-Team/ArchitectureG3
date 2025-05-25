@@ -1,0 +1,12 @@
+@startuml
+class PrintsystemAccessController {
+    + PrintsystemAccessController(printServices:IPrintsystemServices)
+    + <<async>> Index() : Task<IActionResult>
+    + <<async>> AuthenticateByUsername() : Task<IActionResult>
+    + <<async>> AuthenticateByUsername(userAuth:AuthentificationM) : Task<IActionResult>
+    + <<async>> creditUsernameWithQuotaCHF() : Task<IActionResult>
+    + <<async>> creditUsernameWithQuotaCHF(user:UserM) : Task<IActionResult>
+}
+Controller <|-- PrintsystemAccessController
+PrintsystemAccessController --> "_printServices" IPrintsystemServices
+@enduml

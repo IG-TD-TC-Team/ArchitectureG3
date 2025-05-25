@@ -1,0 +1,39 @@
+﻿@{
+    ViewData["Title"] = "Quota Added Successfully";
+}
+
+<div class="row">
+    <div class="col-md-6 mx-auto">
+        <div class="card">
+            <div class="card-header bg-success text-white">
+                <h4>Transaction Complete</h4>
+            </div>
+            <div class="card-body">
+                <div class="alert alert-success">
+                    <i class="fas fa-check-circle"></i> Quota has been successfully added!
+                </div>
+
+                <h5 class="mt-4">Transaction Summary</h5>
+
+                <dl class="row mt-3">
+                    <dt class="col-sm-4">User:</dt>
+                    <dd class="col-sm-8">@ViewBag.Username</dd>
+
+                    <dt class="col-sm-4">Amount Added:</dt>
+                    <dd class="col-sm-8">@ViewBag.Amount.ToString("C")</dd>
+
+                    <dt class="col-sm-4">Transaction Date:</dt>
+                    <dd class="col-sm-8">@DateTime.Now.ToString("dd/MM/yyyy HH:mm")</dd>
+                </dl>
+
+                <div class="alert alert-info mt-4">
+                    <strong>Note:</strong> The quota has been added to the user's account and can now be used for printing services.
+                </div>
+            </div>
+            <div class="card-footer text-center">
+                <a asp-action="AuthenticateByUsername" class="btn btn-primary">Add Quota for Another User</a>
+                <a asp-action="Index" class="btn btn-success">Return to Home</a>
+            </div>
+        </div>
+    </div>
+</div>

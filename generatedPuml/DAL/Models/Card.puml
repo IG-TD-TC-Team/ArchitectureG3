@@ -1,0 +1,12 @@
+@startuml
+class Card {
+    - Card()
+    + Card(userid:Guid)
+    + IsActive : bool <<get>> <<set>>
+}
+Card --> "CardID" Guid
+Card --> "UserID" Guid
+Card --> "User" User
+Card --> "CreationDate" DateTime
+Card --> "ExpirationDate" DateTime
+@enduml

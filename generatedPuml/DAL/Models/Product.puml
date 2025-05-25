@@ -1,0 +1,14 @@
+@startuml
+class Product {
+    + Product()
+    + Product(name:string, description:string, pricePerUnit:decimal, printQuotaCost:int, color:bool, paperSize:string, paperType:string)
+    + Name : string <<get>> <<set>>
+    + Description : string <<get>> <<set>>
+    + PricePerUnit : decimal <<get>> <<set>>
+    + PrintQuotaCost : decimal <<get>> <<set>>
+    + Color : bool <<get>> <<set>>
+    + PaperSize : string <<get>> <<set>>
+    + PaperType : string <<get>> <<set>>
+}
+Product --> "ProductID" Guid
+@enduml

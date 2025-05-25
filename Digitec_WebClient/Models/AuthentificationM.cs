@@ -6,5 +6,8 @@
         public string Password { get; set; }
         
         public Guid UID { get; set; }
+        
+        public string Message { get; set; } = string.Empty;
+        public bool IsSuccessful => Message?.ToLower().Contains("successful access") == true;
     }
 }
