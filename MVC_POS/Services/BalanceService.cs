@@ -7,7 +7,8 @@ namespace MVC_POS.Services
     public class BalanceService : IBalanceService
     {
         private readonly HttpClient _client;
-        private readonly string _baseUrl = "https://localhost:7101"; //TODO: Add the base URL of the API
+        private readonly string _baseUrl = "https://localhost:7101"; 
+        
         public BalanceService(HttpClient client)
         {
             _client = client;
@@ -15,7 +16,7 @@ namespace MVC_POS.Services
 
         public async Task<UserM> CreditUserWithQuotaCHFAsync(Guid userId, decimal quotaCHF)
         {
-            var url = _baseUrl + "/creditUIDWithQuotaCHF";
+            var url = _baseUrl + "/BalanceController";
             var payload = new { UserID = userId, QuotaCHF = quotaCHF };
             var json = JsonSerializer.Serialize(payload);
             var response = await _client.PostAsJsonAsync(url, json);
@@ -29,7 +30,7 @@ namespace MVC_POS.Services
 
         public async Task<UserM> GetUserBalanceAsync(Guid userId)
         {
-            var url = $"{_baseUrl}/api/Balance/getUserBalance?userId={userId}";
+            var url = $"{_baseUrl}/BalanceController?userId={userId}";
             var response = await _client.GetAsync(url);
 
             if (response.IsSuccessStatusCode)
