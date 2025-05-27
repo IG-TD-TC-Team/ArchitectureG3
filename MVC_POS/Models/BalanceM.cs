@@ -1,15 +1,20 @@
-﻿using System;
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 
 namespace MVC_POS.Models
 {
     public class BalanceM
     {
-        public Guid UserId { get; set; }
+        public Guid UserID { get; set; }
 
         [Required(ErrorMessage = "Amount is required")]
-        [Range(0.01, 1000, ErrorMessage = "Amount must be positive and less than 1000")]
+        [Range(0.01, 1000.00, ErrorMessage = "Amount must be between 0.01 and 1000.00 CHF")]
         [Display(Name = "Amount (CHF)")]
-        public decimal Amount { get; set; }
+        [DataType(DataType.Currency)]
+        public decimal QuotaCHF { get; set; }
+
+        // Response properties
+        public decimal NewQuotaCHF { get; set; }
+        public int NewPrintQuota { get; set; }
+        public bool Done { get; set; }
     }
 }
