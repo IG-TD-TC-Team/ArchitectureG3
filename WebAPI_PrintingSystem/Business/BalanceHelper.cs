@@ -1,5 +1,6 @@
 ﻿
 using DAL;
+using DAL.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration.UserSecrets;
 
@@ -21,7 +22,7 @@ namespace WebAPI_PrintingSystem.Business
         public decimal additionQuotaCHF(decimal quotaCHF, decimal actualQuotaCHF)
         {
             decimal newQuotaCHF = quotaCHF + actualQuotaCHF;
-            
+
             return newQuotaCHF;
 
         }
@@ -33,14 +34,14 @@ namespace WebAPI_PrintingSystem.Business
 
             decimal decimalResult = quotaCHF / quotaCHFToCopyQuota;
 
-            
+
             int copyQuota = (int)Math.Ceiling(decimalResult);
 
             return copyQuota;
         }
 
-  
-    public async Task<decimal> getQuotaCHFByUID(Guid userID)
+
+        public async Task<decimal> getQuotaCHFByUID(Guid userID)
         {
             var user = await _repo.Users.FirstOrDefaultAsync(u => u.UserID == userID);
 
@@ -60,7 +61,7 @@ namespace WebAPI_PrintingSystem.Business
             {
                 user.CopyQuota = copyQuota;
                 await _repo.SaveChangesAsync();
-                var savedCopyQuota = user.CopyQuota; 
+                var savedCopyQuota = user.CopyQuota;
                 return savedCopyQuota; ///Changes: Return the updatedQuota that will bi writed in the DB
             }
             return 0;
@@ -80,7 +81,7 @@ namespace WebAPI_PrintingSystem.Business
         }
 
         //--------------Exposed Methods----------------
-        public async Task<(decimal , int, bool )> creditUIDWithQuotaCHF(Guid userID, decimal quotaCHF)
+        public async Task<(decimal, int, bool)> creditUIDWithQuotaCHF(Guid userID, decimal quotaCHF)
         {
             decimal actualQuotaCHF = await getQuotaCHFByUID(userID);
             decimal NewQuotaCHF = additionQuotaCHF(quotaCHF, actualQuotaCHF);
@@ -88,21 +89,21 @@ namespace WebAPI_PrintingSystem.Business
             int copyQuota = convertQuotaCHFToCopyQuota(NewQuotaCHF);
             int resultUpdateCopyQuota = await updateCopyQuotaByUID(userID, copyQuota);
 
-            return (NewQuotaCHF,copyQuota, true);
+            return (NewQuotaCHF, copyQuota, true);
         }
 
-        public async Task<(decimal ,bool )> creditUsernameWithQuotaCHF(string username, decimal quotaCHF)
+        public async Task<(decimal, bool)> creditUsernameWithQuotaCHF(string username, decimal quotaCHF)
         {
             if (await _authHelper.usernameExists(username))
             {
                 Guid userID = await _authHelper.getUIDByUsername(username); //check username
                 decimal actualQuotaCHF = await getQuotaCHFByUID(userID); // get by username
-                decimal newQuotaCHF = additionQuotaCHF(quotaCHF, actualQuotaCHF); 
+                decimal newQuotaCHF = additionQuotaCHF(quotaCHF, actualQuotaCHF);
                 await updateQuotaCHFByUID(userID, newQuotaCHF); // by username
                 int copyQuota = convertQuotaCHFToCopyQuota(newQuotaCHF);
                 await updateCopyQuotaByUID(userID, copyQuota); // by username
-                
-                return (quotaCHF ,true);
+
+                return (quotaCHF, true);
             }
             else
             {
@@ -111,6 +112,24 @@ namespace WebAPI_PrintingSystem.Business
 
         }
 
+        public async Task<(List<User>, decimal, bool)> creditGroupWithQuotaCHF(string group, decimal quotaCHF)
+        {
+            var users = await _repo.Users.Where(u => u.Group == group).ToListAsync();
+            if (users.Count == 0)
+            {
+                return (null, 0, false);
+            }
 
+            foreach (var user in users)
+            {
+
+                user.QuotaCHF += quotaCHF;
+                user.CopyQuota = convertQuotaCHFToCopyQuota(user.QuotaCHF);
+            }
+            await _repo.SaveChangesAsync();
+            return (users, quotaCHF, true);
+
+
+        }
     }
 }

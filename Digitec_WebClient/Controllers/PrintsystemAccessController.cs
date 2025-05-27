@@ -107,11 +107,14 @@ namespace MVC_Faculties.Controllers
             {
                 var result = await _printServices.creditUsernameWithQuotaCHF(quotaRequest);
 
-                // Show success message
-                TempData["SuccessMessage"] = $"Successfully added {quotaRequest.QuotaCHF:C} CHF to {quotaRequest.Username}'s account.";
+                
+                TempData["SuccessMessage"] = $"Successfully added {quotaRequest.QuotaCHF:C} CHF quota to {quotaRequest.Username}'s account.";
 
-                // Redirect back to the same view to allow adding more credit or go to index
-                return RedirectToAction("QuotaAddedSuccess", new { username = quotaRequest.Username, amount = quotaRequest.QuotaCHF });
+                return RedirectToAction("QuotaAddedSuccess", new
+                {
+                    username = quotaRequest.Username,
+                    amount = quotaRequest.QuotaCHF  // Amount added
+                });
             }
             catch (Exception ex)
             {
