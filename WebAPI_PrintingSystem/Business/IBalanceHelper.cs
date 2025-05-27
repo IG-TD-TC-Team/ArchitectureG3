@@ -1,4 +1,5 @@
-﻿using System;
+﻿using DAL.Models;
+using System;
 
 namespace WebAPI_PrintingSystem.Business
 {
@@ -22,6 +23,14 @@ namespace WebAPI_PrintingSystem.Business
 
         Task<(decimal, bool)> creditUsernameWithQuotaCHF(string username, decimal quotaCHF);
 
+
+        /// <summary>
+        /// Credits a group of users with a specified quota in CHF
+        /// </summary>
+        /// <param name="group"></param>
+        /// <param name="quotaCHF"></param>
+        /// <returns></returns>
+        Task<(List<User>, decimal, bool)> creditGroupWithQuotaCHF(string group, decimal quotaCHF);
 
 
 
