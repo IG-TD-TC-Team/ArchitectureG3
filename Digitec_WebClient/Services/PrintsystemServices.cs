@@ -38,14 +38,15 @@ namespace MVC_Faculties.Services
                     Username = userAuth.Username,
                     Password = userAuth.Password,
                     Message = apiResponse.GetProperty("message").GetString() ?? "",
-                    UID = Guid.Parse(apiResponse.GetProperty("uid").GetString() ?? Guid.Empty.ToString())
+                    UID = Guid.Parse(apiResponse.GetProperty("uid").GetString() ?? Guid.Empty.ToString()),
+                    IsStaff = apiResponse.GetProperty("isStaff").GetBoolean()
                 };
             }
 
             throw new HttpRequestException($"Authentication failed with status code: {response.StatusCode}");
         }
 
-
+       
 
         public async Task<UserM> creditUsernameWithQuotaCHF(UserM quotaRequest)
         {
@@ -55,7 +56,8 @@ namespace MVC_Faculties.Services
             var payload = new
             {
                 Username = quotaRequest.Username,
-                QuotaCHF = quotaRequest.QuotaCHF
+                QuotaCHF = quotaRequest.QuotaCHF,
+                Group = quotaRequest.Group ?? ""
             };
 
 

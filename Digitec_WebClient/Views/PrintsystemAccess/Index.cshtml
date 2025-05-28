@@ -1,4 +1,5 @@
-﻿@{
+﻿
+@{
     ViewData["Title"] = "Printing System Home";
 }
 
@@ -10,14 +11,40 @@
     @if (TempData["ErrorMessage"] != null)
     {
         <div class="alert alert-danger">
-            @TempData["ErrorMessage"]
+            <i class="fas fa-exclamation-triangle"></i> @TempData["ErrorMessage"]
         </div>
     }
 
     @if (TempData["SuccessMessage"] != null)
     {
         <div class="alert alert-success">
-            @TempData["SuccessMessage"]
+            <i class="fas fa-check-circle"></i> @TempData["SuccessMessage"]
+        </div>
+    }
+
+    @* Show authentication status if user is logged in *@
+    @if (TempData["Username"] != null)
+    {
+        <div class="alert alert-info">
+            <div class="d-flex justify-content-between align-items-start">
+                <div>
+                    <h5><i class="fas fa-user"></i> Welcome, @TempData["Username"]!</h5>
+                    @if (TempData["IsStaff"]?.ToString() == "True")
+                    {
+                        <p class="mb-0"><i class="fas fa-shield-alt text-success"></i> <strong>Staff Access:</strong> You have permissions for both individual and group quota management.</p>
+                    }
+                    else
+                    {
+                        <p class="mb-0"><i class="fas fa-info-circle text-warning"></i> <strong>Standard Access:</strong> You can manage individual user quotas only.</p>
+                    }
+                </div>
+                <!-- Simple Logout button -->
+                <div>
+                    <a asp-action="Logout" class="btn btn-outline-secondary btn-sm">
+                        <i class="fas fa-sign-out-alt"></i> Logout
+                    </a>
+                </div>
+            </div>
         </div>
     }
 
@@ -44,7 +71,6 @@
                         requests, special allocations, or targeted quota adjustments.
                     </p>
 
-                    @* Feature highlights for individual management *@
                     <ul class="list-unstyled text-start mb-4">
                         <li><i class="fas fa-check text-success"></i> Precise control over individual accounts</li>
                         <li><i class="fas fa-check text-success"></i> Username and password authentication</li>
@@ -53,13 +79,14 @@
                     </ul>
 
                     <div class="mt-auto">
-                        <a asp-action="AuthenticateByUsername" class="btn btn-primary btn-lg">
+                       
+                        <a asp-action="AddQuotaByUsername" class="btn btn-primary btn-lg">
                             <i class="fas fa-user-plus"></i> Manage Individual User
                         </a>
                     </div>
                 </div>
                 <div class="card-footer text-muted text-center">
-                    <small>Best for: Single user requests, special allocations</small>
+                    <small>Available to all authenticated users</small>
                 </div>
             </div>
         </div>
@@ -70,6 +97,10 @@
                 <div class="card-header bg-warning text-dark">
                     <h5 class="card-title mb-0">
                         <i class="fas fa-users"></i> Group Management
+                        @if (TempData["Username"] == null || TempData["IsStaff"]?.ToString() != "True")
+                        {
+                            <i class="fas fa-key ml-2" title="Authentication required"></i>
+                        }
                     </h5>
                 </div>
                 <div class="card-body d-flex flex-column">
@@ -78,7 +109,6 @@
                         Ideal for bulk operations, semester allocations, or department-wide updates.
                     </p>
 
-                    @* Feature highlights for group management *@
                     <ul class="list-unstyled text-start mb-4">
                         <li><i class="fas fa-check text-success"></i> Bulk quota distribution</li>
                         <li><i class="fas fa-check text-success"></i> Group-based targeting (student, staff, faculty)</li>
@@ -86,57 +116,71 @@
                         <li><i class="fas fa-check text-success"></i> Comprehensive operation reports</li>
                     </ul>
 
+                    <!-- Status indicators based on current authentication -->
+                    @if (TempData["IsStaff"]?.ToString() == "True")
+                    {
+                        <div class="alert alert-success">
+                            <i class="fas fa-shield-alt"></i> <strong>Staff Access Verified</strong>
+                        </div>
+                    }
+                    else if (TempData["Username"] != null)
+                    {
+                        <div class="alert alert-warning">
+                            <i class="fas fa-exclamation-triangle"></i> <strong>Staff Access Required</strong><br>
+                            <small>Your account doesn't have staff permissions for group operations.</small>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="alert alert-info">
+                            <i class="fas fa-info-circle"></i> <strong>Authentication Required</strong><br>
+                            <small>Click below to authenticate and access group management.</small>
+                        </div>
+                    }
+
                     <div class="mt-auto">
-                        <a asp-action="AddQuotaByGroup" class="btn btn-warning btn-lg">
-                            <i class="fas fa-users-cog"></i> Manage Group Quota
-                        </a>
+                        @if (TempData["IsStaff"]?.ToString() == "True")
+                        {
+                            <!-- User is already authenticated and has staff permissions -->
+                            <a asp-action="AddQuotaByGroup" class="btn btn-success btn-lg">
+                                <i class="fas fa-users-cog"></i> Manage Group Quota
+                            </a>
+                        }
+                        else if (TempData["Username"] != null)
+                        {
+                            <!-- User is authenticated but doesn't have staff permissions -->
+                            <button class="btn btn-secondary btn-lg" disabled>
+                                <i class="fas fa-users-cog"></i> Staff Access Required
+                            </button>
+                        }
+                        else
+                        {
+                            <!-- SIMPLE: Direct link - will auto-redirect to auth if needed -->
+                            <a asp-action="AddQuotaByGroup" class="btn btn-warning btn-lg">
+                                <i class="fas fa-users-cog"></i> Manage Group Quota
+                            </a>
+                        }
                     </div>
                 </div>
                 <div class="card-footer text-muted text-center">
-                    <small>Best for: Semester start, department allocations, bulk updates</small>
+                    <small>
+                        @if (TempData["IsStaff"]?.ToString() == "True")
+                        {
+                            <span class="text-success">✓ Staff permissions active</span>
+                        }
+                        else if (TempData["Username"] != null)
+                        {
+                            <span class="text-warning">⚠ Staff access required</span>
+                        }
+                        else
+                        {
+                            <span class="text-info">Click to authenticate</span>
+                        }
+                    </small>
                 </div>
             </div>
         </div>
     </div>
 
-    @* Additional system features section *@
-    <div class="row mt-5">
-        <div class="col-12">
-            <h4 class="mb-4">Additional System Features</h4>
-        </div>
-    </div>
-
-    <div class="row">
-        @* System Status and Monitoring *@
-        <div class="col-md-4 mb-3">
-            <div class="card">
-                <div class="card-body text-center">
-                    <i class="fas fa-chart-bar fa-2x text-info mb-3"></i>
-                    <h6 class="card-title">System Reports</h6>
-                    <p class="card-text small">View usage statistics and quota distribution reports.</p>
-                    <a href="#" class="btn btn-outline-info btn-sm disabled">
-                        Coming Soon
-                    </a>
-                </div>
-            </div>
-        </div>
-
-        @* Print History *@
-        <div class="col-md-4 mb-3">
-            <div class="card">
-                <div class="card-body text-center">
-                    <i class="fas fa-history fa-2x text-secondary mb-3"></i>
-                    <h6 class="card-title">Print History</h6>
-                    <p class="card-text small">Review detailed printing transaction logs and user activity.</p>
-                    <a href="#" class="btn btn-outline-secondary btn-sm disabled">
-                        Coming Soon
-                    </a>
-                </div>
-            </div>
-        </div>
-
-        @* Printer Status *@
-        <div class="col-md-4 mb-3">
-            <div class="card">
-                <div class="card-body text-center">
-                    <i class="fas fa-print fa-2x text
+    
+</div>

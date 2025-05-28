@@ -130,6 +130,19 @@ namespace WebAPI_PrintingSystem.Business
             return user.UserID;
         }
 
+        public async Task<bool> isUserStaff(Guid userId)
+        {
+            try
+            {
+                var user = await _repo.Users.FirstOrDefaultAsync(u => u.UserID == userId);
+                return user?.Group?.ToLower() == "staff" || user?.Group?.ToLower() == "admin";
+            }
+            catch (Exception)
+            {
+                return false;
+            }
+        }
+
 
         //--------- Exposed Methods------------------
 
@@ -224,7 +237,40 @@ namespace WebAPI_PrintingSystem.Business
             }
         }
 
-
+        public async Task<(string, Guid?, bool)> authenticateByUsernameWithStaffCheck(string username, string password)
+        {
+            if (await usernameExists(username))
+            {
+                if (await isUserActive(username))
+                {
+                    if (await verifyPasswordWithUsername(username, password))
+                    {
+                        try
+                        {
+                            var userId = await getUIDByUsername(username);
+                            var isStaff = await isUserStaff(userId);
+                            return ("Successful access", userId, isStaff);
+                        }
+                        catch (InvalidOperationException)
+                        {
+                            return ("Username has no associated user ID", null, false);
+                        }
+                    }
+                    else
+                    {
+                        return ("Incorrect password", null, false);
+                    }
+                }
+                else
+                {
+                    return ("User is not active", null, false);
+                }
+            }
+            else
+            {
+                return ("Username not found", null, false);
+            }
+        }
 
     }
 }

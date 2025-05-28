@@ -78,12 +78,12 @@ namespace WebAPI_PrintingSystem.Controllers
 
                 try
                 {
-                    var result = await _authentificationHelper.authenticateByUsername(request.Username, request.Password);
+                    var result = await _authentificationHelper.authenticateByUsernameWithStaffCheck(request.Username, request.Password);
 
                     // Check if authentication was successful
                     if (result.Item1.ToLower().Contains("successful access"))
                     {
-                        return Ok(new { message = result.Item1, UID = result.Item2 });
+                        return Ok(new { message = result.Item1, UID = result.Item2, isStaff = result.Item3 });
                     }
                     else
                     {
