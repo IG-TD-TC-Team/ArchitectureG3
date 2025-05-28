@@ -7,42 +7,53 @@ namespace MVC_POS.Services
     public class BalanceService : IBalanceService
     {
         private readonly HttpClient _client;
-        private readonly string _baseUrl = "https://localhost:7101"; 
-        
+        private readonly string _baseUrl = "https://localhost:7101api/Balance/";
+
         public BalanceService(HttpClient client)
         {
             _client = client;
         }
 
-        public async Task<UserM> CreditUserWithQuotaCHFAsync(Guid userId, decimal quotaCHF)
+        public async Task<UserM> CreditUIDWithQuotaCHF(UserM quotaRequest)
         {
-            var url = _baseUrl + "/BalanceController";
-            var payload = new { UserID = userId, QuotaCHF = quotaCHF };
-            var json = JsonSerializer.Serialize(payload);
-            var response = await _client.PostAsJsonAsync(url, json);
-            if (response.IsSuccessStatusCode)
-            {
-                var responseContent = await response.Content.ReadAsStringAsync();
-                return JsonSerializer.Deserialize<UserM>(responseContent);
-            }
-            throw new HttpRequestException($"Creditation failed with status code: {response.StatusCode}");
-        }
+            var url = _baseUrl + "/creditUIDWithQuotaCHF";
 
-        public async Task<UserM> GetUserBalanceAsync(Guid userId)
-        {
-            var url = $"{_baseUrl}/BalanceController?userId={userId}";
-            var response = await _client.GetAsync(url);
+            var payload = new
+            {
+                UserID = quotaRequest.UserID,
+                QuotaCHF = quotaRequest.QuotaCHF
+            };
+
+            var response = await _client.PostAsJsonAsync(url, payload);
 
             if (response.IsSuccessStatusCode)
             {
                 var responseContent = await response.Content.ReadAsStringAsync();
-                return JsonSerializer.Deserialize<UserM>(responseContent, new JsonSerializerOptions
+                Console.WriteLine($"API Response: {responseContent}");
+                var apiResponse = JsonSerializer.Deserialize<JsonElement>(responseContent);
+
+
+                if (apiResponse.TryGetProperty("quotaCHFCharged", out var quotaChargedElement) &&
+                    apiResponse.TryGetProperty("done", out var doneElement) &&
+                    doneElement.GetBoolean())
                 {
-                    PropertyNameCaseInsensitive = true
-                });
+                    return new UserM
+                    {
+                        UserID = quotaRequest.UserID,
+                        QuotaCHF = quotaChargedElement.GetDecimal(),
+                        CopyQuota = 0
+                    };
+                }
+                else
+                {
+                    throw new HttpRequestException($"Credit operation failed or unexpected response format: {responseContent}");
+                }
             }
-
-            throw new HttpRequestException($"Failed to retrieve user balance. Status code: {response.StatusCode}");
+            else
+            {
+                var errorContent = await response.Content.ReadAsStringAsync();
+                throw new HttpRequestException($"API call failed with status code {response.StatusCode}: {errorContent}");
+            }
         }
     }
 }

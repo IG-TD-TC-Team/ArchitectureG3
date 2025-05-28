@@ -1,61 +1,74 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using MVC_POS.Models;
 using MVC_POS.Services;
-using System;
-using System.Threading.Tasks;
+using MVC_POS.Models;
 
 namespace MVC_POS.Controllers
 {
-    public class AuthenticationController : Controller
+    public class AuthenticationAccessController : Controller
     {
-        private readonly IAuthenticationService _authService;
+        private IAuthenticationService _authService;
 
-        public AuthenticationController(IAuthenticationService authService)
+        public AuthenticationAccessController(IAuthenticationService authService)
         {
             _authService = authService;
         }
 
-        // GET: Authentication/Card
+
+        //----------------------INDEX-----------------------------------//
         [HttpGet]
-        public IActionResult Card()
+        public async Task<IActionResult> Index()
         {
-            return View(new CardM());
+
+            return View();
         }
 
-        // POST: Authentication/Card
-        [HttpPost]
-        public async Task<IActionResult> Card(CardM model)
+        //----------------------Authentification------------------------//
+        [HttpGet]
+        public async Task<IActionResult> AuthenticateByCard()
         {
+            //Step0
+            return View(new AuthenticationM());
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> AuthenticateByCard(AuthenticationM userAuth)
+        {
+            //Step1
+
             if (!ModelState.IsValid)
             {
-                return View(model);
+                return View(userAuth);
             }
 
             try
             {
-                var authResult = await _authService.AuthenticateByCardAsync(model.CardId);
+                var authResponse = await _authService.AuthenticateByCard(userAuth);
 
-                if (authResult.IsSuccessful)
+                if (authResponse.IsSuccessful)
                 {
-                    // Store the authenticated user's ID in TempData for use in next step
-                    TempData["UserId"] = authResult.UID.ToString();
+                    // Store the user info in TempData for the next view
+                    TempData["UID"] = authResponse.UID.ToString();
+                    TempData["Username"] = userAuth.Username;
+                    TempData["SuccessMessage"] = authResponse.Message;
 
-                    // Redirect to the balance controller to add credit
-                    return RedirectToAction("CreditUser", "Balance", new { userId = authResult.UID });
+                    // Redirect to the AddQuotaByUID view
+                    return RedirectToAction("AddQuotaByUID");
                 }
                 else
                 {
                     // Authentication failed, show error message
-                    ModelState.AddModelError("", authResult.Message);
-                    return View(model);
+                    ModelState.AddModelError("", (authResponse.Message));
+                    return View(userAuth);
                 }
             }
             catch (Exception ex)
             {
-                // Handle any unexpected errors
                 ModelState.AddModelError("", $"Authentication error: {ex.Message}");
-                return View(model);
+                return View(userAuth);
             }
+
         }
     }
-}
+
+   
+    }
