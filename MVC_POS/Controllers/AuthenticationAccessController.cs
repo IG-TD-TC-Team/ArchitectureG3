@@ -1,6 +1,8 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using MVC_POS.Services;
 using MVC_POS.Models;
+using System;
+using System.Threading.Tasks;
 
 namespace MVC_POS.Controllers
 {
@@ -26,29 +28,27 @@ namespace MVC_POS.Controllers
         [HttpGet]
         public async Task<IActionResult> AuthenticateByCard()
         {
-            //Step0
-            return View(new AuthenticationM());
+            return View();
         }
 
         [HttpPost]
-        public async Task<IActionResult> AuthenticateByCard(AuthenticationM userAuth)
+        public async Task<IActionResult> AuthenticateByCard(Guid cardID)
         {
             //Step1
 
             if (!ModelState.IsValid)
             {
-                return View(userAuth);
+                return View();
             }
 
             try
             {
-                var authResponse = await _authService.AuthenticateByCard(userAuth);
+                var authResponse = await _authService.AuthenticateByCard(cardID);
 
                 if (authResponse.IsSuccessful)
                 {
                     // Store the user info in TempData for the next view
-                    TempData["UID"] = authResponse.UID.ToString();
-                    TempData["Username"] = userAuth.Username;
+                    TempData["UID"] = authResponse.UserID.ToString();
                     TempData["SuccessMessage"] = authResponse.Message;
 
                     // Redirect to the AddQuotaByUID view
@@ -58,13 +58,13 @@ namespace MVC_POS.Controllers
                 {
                     // Authentication failed, show error message
                     ModelState.AddModelError("", (authResponse.Message));
-                    return View(userAuth);
+                    return View();
                 }
             }
             catch (Exception ex)
             {
                 ModelState.AddModelError("", $"Authentication error: {ex.Message}");
-                return View(userAuth);
+                return View();
             }
 
         }

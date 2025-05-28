@@ -1,0 +1,47 @@
+﻿@{
+    ViewData["Title"] = "POS System";
+    Layout = "_Layout";
+}
+
+<div class="text-center">
+    <h1 class="display-4">Welcome to the Printing System POS</h1>
+    <p>Please authenticate with your card to begin.</p>
+
+    <div class="mt-4">
+        <a asp-controller="AuthenticationAccess" asp-action="AuthenticateByCard" class="btn btn-primary btn-lg">
+            Scan Card
+        </a>
+    </div>
+</div>
+
+<div class="row mt-5">
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header">
+                <h5>Point of Sale</h5>
+            </div>
+            <div class="card-body">
+                <p>Add funds to your printing account using your card.</p>
+                <ul>
+                    <li>Scan your card to authenticate</li>
+                    <li>Enter the amount to add to your account</li>
+                    <li>Confirm the transaction</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header">
+                <h5>System Information</h5>
+            </div>
+            <div class="card-body">
+                <p>The current rate for printing is:</p>
+                <ul>
+                    <li>A4 Black & White: 0.08 CHF per page</li>
+                </ul>
+                <p>For any issues with the system, please contact the administrator.</p>
+            </div>
+        </div>
+    </div>
+</div>

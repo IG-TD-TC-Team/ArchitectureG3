@@ -20,24 +20,26 @@ namespace MVC_POS.Services
         {
             var url = _baseUrl + "authenticateByCard";
 
-            var payload = new { CardID = cardID };
-
-            var response = await _client.PostAsJsonAsync(url, payload);
+            var response = await _client.PostAsJsonAsync(url, cardID);
 
             var responseContent = await response.Content.ReadAsStringAsync();
 
             if (response.IsSuccessStatusCode)
             {
                 var apiResponse = JsonSerializer.Deserialize<JsonElement>(responseContent);
-                
+
                 return new AuthenticationM
                 {
                     Message = apiResponse.GetProperty("message").GetString() ?? "",
-                    UserID = Guid.Parse(apiResponse.GetProperty("UID").GetString() ?? Guid.Empty.ToString())
+                    UserID = apiResponse.GetProperty("UID").GetGuid()
                 };
             }
 
-            throw new HttpRequestException($"Authentication failed with status code: {response.StatusCode}");
+            return new AuthenticationM
+            {
+                Message = $"Authentication failed with status code: {response.StatusCode}",
+                UserID = Guid.Empty
+            };
         }
     }
  }
