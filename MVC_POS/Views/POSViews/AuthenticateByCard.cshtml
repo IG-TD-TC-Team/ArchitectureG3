@@ -1,0 +1,25 @@
+﻿@{
+    ViewData["Title"] = "Authenticate Card";
+    Layout = "_Layout";
+}
+
+<h2>Scan Your Card</h2>
+
+<div asp-validation-summary="All" class="text-danger"></div>
+
+<form asp-controller="AuthenticationAccess" asp-action="AuthenticateByCard" method="post">
+    <div class="form-group">
+        <label for="cardID">Card ID</label>
+        <input type="text" id="cardID" name="cardID" class="form-control" />
+    </div>
+
+    <div class="form-group">
+        <input type="submit" value="Authenticate" class="btn btn-primary" />
+    </div>
+</form>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

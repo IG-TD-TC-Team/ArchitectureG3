@@ -17,9 +17,8 @@ namespace MVC_Faculties.Controllers
         //----------------------INDEX-----------------------------------//
         [HttpGet]
         public async Task<IActionResult> Index()
-        {
-            
-            return View(); 
+        {         
+            return View();
         }
 
         //----------------------Authentification------------------------//
