@@ -1,6 +1,7 @@
 ﻿using DAL.Models;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using System.ComponentModel.DataAnnotations;
 using WebAPI_PrintingSystem.Business;
 
 namespace WebAPI_PrintingSystem.Controllers
@@ -89,9 +90,18 @@ namespace WebAPI_PrintingSystem.Controllers
         // DTO for credit username with quota CHF request
         public class CreditUsernameRequest
         {
-            public string Username { get; set; }
+            public string? Username { get; set; }
             public decimal QuotaCHF { get; set; }
             public string Group { get; set; }
+        }
+
+        public class CreditGroupRequest
+        {
+            
+            public string Group { get; set; }
+
+         
+            public decimal QuotaCHF { get; set; }
         }
 
     }

@@ -133,5 +133,88 @@ namespace MVC_Faculties.Controllers
         }
 
 
+        //------------------------AddQuotaByGroup-----------------------------//
+        [HttpGet]
+        public IActionResult AddQuotaByGroup()
+        {
+            // Check if we have authenticated user info
+            // This assumes the user has been authenticated and we have their info
+            if (TempData["UID"] == null || TempData["Username"] == null)
+            {
+                TempData["ErrorMessage"] = "Please authenticate first.";
+                return RedirectToAction("AuthenticateByUsername");
+            }
+
+            // Create a model for group quota operations
+            var model = new GroupQuotaM
+            {
+                // We can pre-populate with common group names if desired
+                GroupName = "",
+                QuotaCHF = 0,
+                AuthenticatedUser = TempData["Username"].ToString()
+            };
+
+            // Keep the authentication data for the POST request
+            TempData.Keep("UID");
+            TempData.Keep("Username");
+
+            ViewBag.SuccessMessage = TempData["SuccessMessage"];
+
+            return View(model);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> AddQuotaByGroup(GroupQuotaM model)
+        {
+            // Validate the submitted form data
+            if (!ModelState.IsValid)
+            {
+                return View(model);
+            }
+
+            // Ensure we have valid data
+            if (string.IsNullOrWhiteSpace(model.GroupName) || model.QuotaCHF <= 0)
+            {
+                ModelState.AddModelError("", "Please provide a valid group name and amount.");
+                return View(model);
+            }
+
+            try
+            {
+                // Call your service method to credit the entire group
+                var creditedUsers = await _printServices.creditGroupWithQuotaCHF(
+                    model.GroupName,
+                    model.QuotaCHF
+                );
+
+                // Provide success feedback
+                TempData["SuccessMessage"] = $"Successfully added {model.QuotaCHF:C} CHF quota to {creditedUsers.Count} users in the '{model.GroupName}' group.";
+
+                return RedirectToAction("GroupQuotaSuccess", new
+                {
+                    groupName = model.GroupName,
+                    amount = model.QuotaCHF,
+                    userCount = creditedUsers.Count
+                });
+            }
+            catch (Exception ex)
+            {
+                ModelState.AddModelError("", $"Error adding quota to group: {ex.Message}");
+                return View(model);
+            }
+        }
+
+        //------------------------Success Page for Group Operations-----------------------------//
+        [HttpGet]
+        public IActionResult GroupQuotaSuccess(string groupName, decimal amount, int userCount)
+        {
+            ViewBag.GroupName = groupName;
+            ViewBag.Amount = amount;
+            ViewBag.UserCount = userCount;
+            return View();
+        }
+
+
+
     }
 }
