@@ -24,19 +24,21 @@ namespace MVC_Faculties.Controllers
 
         //----------------------Authentification------------------------//
         [HttpGet]
-        public async Task<IActionResult> AuthenticateByUsername()
+        public async Task<IActionResult> AuthenticateByUsername(string returnUrl = null)
         {
+            ViewBag.ReturnUrl = returnUrl;
             //Step0
             return View(new AuthentificationM());
         }
 
         [HttpPost]
-        public async Task<IActionResult> AuthenticateByUsername(AuthentificationM userAuth)
+        public async Task<IActionResult> AuthenticateByUsername(AuthentificationM userAuth, string returnUrl = null)
         {
             //Step1
 
             if (!ModelState.IsValid)
             {
+                ViewBag.ReturnUrl = returnUrl;
                 return View(userAuth);
             }
 
@@ -49,25 +51,68 @@ namespace MVC_Faculties.Controllers
                     // Store the user info in TempData for the next view
                     TempData["UID"] = authResponse.UID.ToString();
                     TempData["Username"] = userAuth.Username;
+                    TempData["IsStaff"] = authResponse.IsStaff.ToString();
                     TempData["SuccessMessage"] = authResponse.Message;
 
+                    if (!string.IsNullOrEmpty(returnUrl))
+                    {
+                        // Check if user has permission for the requested URL
+                        if (returnUrl.Contains("AddQuotaByGroup", StringComparison.OrdinalIgnoreCase))
+                        {
+                            if (authResponse.IsStaff)
+                            {
+                                return LocalRedirect(returnUrl);
+                            }
+                            else
+                            {
+                                TempData["ErrorMessage"] = "Access denied: Only staff members can manage group quotas.";
+                                return RedirectToAction("Index");
+                            }
+                        }
+                        else
+                        {
+                            // For other URLs, redirect normally
+                            return LocalRedirect(returnUrl);
+                        }
+                    }
+                    ///DEFAULT REDIRECT
                     // Redirect to the AddQuotaByUsername view
                     return RedirectToAction("AddQuotaByUsername");
                 }
                 else
                 {
                     // Authentication failed, show error message
+                    ViewBag.ReturnUrl = returnUrl;
                     ModelState.AddModelError("", (authResponse.Message));
                     return View(userAuth);
                 }
             }
             catch (Exception ex)
             {
+                ViewBag.ReturnUrl = returnUrl;
                 ModelState.AddModelError("", $"Authentication error: {ex.Message}");
                 return View(userAuth);
             }
 
         }
+        [HttpGet]
+        public IActionResult ChangeUser()
+        {
+            TempData.Clear();
+            TempData["InfoMessage"] = "Please authenticate as a different user.";
+            return RedirectToAction("AuthenticateByUsername");
+        }
+
+        [HttpGet]
+        public IActionResult Logout()
+        {
+            // Clear all authentication data
+            TempData.Clear();
+
+            // Redirect back to index 
+            return RedirectToAction("Index");
+        }
+
 
         //------------------------AddQuotaByUsername-----------------------------//
         [HttpGet]
@@ -76,8 +121,8 @@ namespace MVC_Faculties.Controllers
             // Check if we have user info from authentication
             if (TempData["UID"] == null || TempData["Username"] == null)
             {
-                TempData["ErrorMessage"] = "Please authenticate first.";
-                return RedirectToAction("AuthenticateByUsername");
+                var returnUrl = Url.Action("AddQuotaByUsername", "PrintsystemAccess");
+                return RedirectToAction("AuthenticateByUsername", new { returnUrl = returnUrl });
             }
 
             var model = new UserM
@@ -89,6 +134,7 @@ namespace MVC_Faculties.Controllers
             // Keep the data for the POST request
             TempData.Keep("UID");
             TempData.Keep("Username");
+            TempData.Keep("IsStaff");
 
             ViewBag.SuccessMessage = TempData["SuccessMessage"];
 
@@ -141,14 +187,24 @@ namespace MVC_Faculties.Controllers
             // This assumes the user has been authenticated and we have their info
             if (TempData["UID"] == null || TempData["Username"] == null)
             {
-                TempData["ErrorMessage"] = "Please authenticate first.";
-                return RedirectToAction("AuthenticateByUsername");
+                var returnUrl = Url.Action("AddQuotaByGroup", "PrintsystemAccess");
+                return RedirectToAction("AuthenticateByUsername", new { returnUrl = returnUrl });
             }
+
+            //Check if is staff
+            if (TempData["IsStaff"]?.ToString() != "True")
+            {
+                TempData["ErrorMessage"] = "Access denied: Only staff members can manage group quotas.";
+                return RedirectToAction("Index");
+            }
+
+
+
 
             // Create a model for group quota operations
             var model = new GroupQuotaM
             {
-                // We can pre-populate with common group names if desired
+                // Default
                 GroupName = "",
                 QuotaCHF = 0,
                 AuthenticatedUser = TempData["Username"].ToString()
@@ -157,8 +213,10 @@ namespace MVC_Faculties.Controllers
             // Keep the authentication data for the POST request
             TempData.Keep("UID");
             TempData.Keep("Username");
+            TempData.Keep("IsStaff");
 
             ViewBag.SuccessMessage = TempData["SuccessMessage"];
+            ViewBag.StaffMessage = "Staff access confirmed - you can manage group quotas.";
 
             return View(model);
         }

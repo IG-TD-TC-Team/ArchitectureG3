@@ -9,5 +9,6 @@
         
         public string Message { get; set; } = string.Empty;
         public bool IsSuccessful => Message?.ToLower().Contains("successful access") == true;
+        public bool IsStaff { get; set; }
     }
 }

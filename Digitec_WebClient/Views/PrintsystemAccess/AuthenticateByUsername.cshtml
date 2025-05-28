@@ -1,4 +1,5 @@
-﻿@model Digitec_WebClient.Models.AuthentificationM
+﻿
+@model Digitec_WebClient.Models.AuthentificationM
 
 @{
     ViewData["Title"] = "Login";
@@ -18,8 +19,35 @@
                     </div>
                 }
 
+                
+                @if (!string.IsNullOrEmpty(ViewBag.ReturnUrl))
+                {
+                    <div class="alert alert-info">
+                        <i class="fas fa-info-circle"></i>
+                        <strong>Authentication Required</strong><br>
+                        @if (ViewBag.ReturnUrl.ToString().Contains("AddQuotaByGroup"))
+                        {
+                            <small>You are being redirected to <strong>Group Quota Management</strong>. Staff permissions required.</small>
+                        }
+                        else if (ViewBag.ReturnUrl.ToString().Contains("AddQuotaByUsername"))
+                        {
+                            <small>You are being redirected to <strong>Individual User Management</strong>.</small>
+                        }
+                        else
+                        {
+                            <small>You will be redirected to your requested page after login.</small>
+                        }
+                    </div>
+                }
+
                 <form asp-action="AuthenticateByUsername" method="post">
                     <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+
+                   
+                    @if (!string.IsNullOrEmpty(ViewBag.ReturnUrl))
+                    {
+                        <input type="hidden" name="returnUrl" value="@ViewBag.ReturnUrl" />
+                    }
 
                     <div class="form-group mb-3">
                         <label asp-for="Username" class="control-label"></label>

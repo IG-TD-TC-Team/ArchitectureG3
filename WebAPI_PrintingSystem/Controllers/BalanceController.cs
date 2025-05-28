@@ -92,7 +92,7 @@ namespace WebAPI_PrintingSystem.Controllers
         {
             public string? Username { get; set; }
             public decimal QuotaCHF { get; set; }
-            public string Group { get; set; }
+            public string? Group { get; set; }
         }
 
         public class CreditGroupRequest

@@ -56,6 +56,18 @@ namespace WebAPI_PrintingSystem.Business
         /// </summary>
         Task<bool> verifyPasswordWithUsername(string username, string password);
 
+        /// <summary>
+        /// Checks if a user is a staff member based on their user ID
+        /// </summary>
+        /// <param name="userId"></param>
+        /// <returns></returns>
+        Task<bool> isUserStaff(Guid userId);
+
+        /// <summary>
+        ///     
+
+        Task<(string, Guid?, bool)> authenticateByUsernameWithStaffCheck(string username, string password);
+
 
 
     }
