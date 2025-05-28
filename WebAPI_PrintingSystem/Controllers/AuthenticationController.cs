@@ -33,29 +33,42 @@ namespace WebAPI_PrintingSystem.Controllers
         }
 
         [HttpPost("authenticateByCard")]
-        public async Task<ActionResult> AuthenticateByCard([FromBody] Guid cardId)
+        public async Task<ActionResult> AuthenticateByCard([FromBody] CardAuthenticationRequest request)
         {
             try
             {
-                var result = await _authentificationHelper.authenticateByCard(cardId);
-
-                // Check if authentication was successful
-                if (result.Item1.ToLower().Contains("successfull access"))
+                // Validate input 
+                if (request.cardID == Guid.Empty)
                 {
-                    // Return success with both the message and the UID
-                    return Ok(new
-                    {
-                        message = result.Item1,
-                        UID = result.Item2
-                    });
+                    return BadRequest(new { message = "Card ID is required." });
                 }
-                else
+
+                try
                 {
-                    // Return unauthorized with error message
-                    return Unauthorized(new
+                    var result = await _authentificationHelper.authenticateByCard(request.cardID);
+
+                    // Check if authentication was successful
+                    if (result.Item1.ToLower().Contains("successful access"))
                     {
-                        message = result.Item1
-                    });
+                        // Return success with both the message and the UID
+                        return Ok(new
+                        {
+                            message = result.Item1,
+                            UID = result.Item2
+                        });
+                    }
+                    else
+                    {
+                        // Return unauthorized with error message
+                        return Unauthorized(new
+                        {
+                            message = result.Item1
+                        });
+                    }
+                }
+                catch (InvalidOperationException ex)
+                {
+                    return BadRequest(new { message = "An error occurred during authentication.", error = ex.Message });
                 }
             }
             catch (Exception ex)
@@ -63,6 +76,12 @@ namespace WebAPI_PrintingSystem.Controllers
                 // Log the exception if you have logging in place
                 return StatusCode(500, new { message = "An error occurred during authentication.", error = ex.Message });
             }
+        }
+
+        // DTO for card authentication
+        public class CardAuthenticationRequest
+        {
+            public Guid cardID { get; set; }
         }
 
         [HttpPost("authenticateByUsername")]
@@ -108,4 +127,6 @@ namespace WebAPI_PrintingSystem.Controllers
         public string Username { get; set; }
         public string Password { get; set; }
     }
+
+
 }

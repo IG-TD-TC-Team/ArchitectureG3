@@ -32,7 +32,7 @@ namespace MVC_POS
 
             app.MapControllerRoute(
                 name: "default",
-                pattern: "{controller=Authentication}/{action=Card}/{id?}");
+                pattern: "{controller=AuthenticationAccess}/{action=index}/{id?}");
 
             app.Run();
         }
