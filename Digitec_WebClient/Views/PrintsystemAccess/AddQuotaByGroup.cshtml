@@ -1,0 +1,84 @@
+﻿@model Digitec_WebClient.Models.GroupQuotaM
+
+@{
+    ViewData["Title"] = "Add Quota to Group";
+}
+
+<div class="row">
+    <div class="col-md-6 mx-auto">
+        <div class="card">
+            <div class="card-header bg-success text-white">
+                <h4>Add Quota to User Group - Welcome @Model.AuthenticatedUser!</h4>
+            </div>
+            <div class="card-body">
+                @* Display success messages from previous operations *@
+                @if (ViewBag.SuccessMessage != null)
+                {
+                    <div class="alert alert-success">
+                        <i class="fas fa-check-circle"></i> @ViewBag.SuccessMessage
+                    </div>
+                }
+
+                @* Show information about who is performing this operation *@
+                <div class="alert alert-info">
+                    <strong>Authenticated User:</strong> @Model.AuthenticatedUser<br>
+                    <small>You are about to add printing quota to all users in a specific group.</small>
+                </div>
+
+                @* The main form where users enter group details *@
+                <form asp-action="AddQuotaByGroup" method="post">
+                    @* Display validation errors at the top of the form *@
+                    <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+
+                    @* Hidden field to preserve the authenticated user information *@
+                    <input type="hidden" asp-for="AuthenticatedUser" />
+
+                    @* Group name input field *@
+                    <div class="form-group mb-3">
+                        <label asp-for="GroupName" class="control-label"></label>
+                        <input asp-for="GroupName" class="form-control" placeholder="e.g., student, staff, faculty" />
+                        <span asp-validation-for="GroupName" class="text-danger"></span>
+                        <small class="form-text text-muted">
+                            Enter the exact group name. Common groups include: student, staff, faculty
+                        </small>
+                    </div>
+
+                    @* Quota amount input field *@
+                    <div class="form-group mb-3">
+                        <label asp-for="QuotaCHF" class="control-label"></label>
+                        <div class="input-group">
+                            <span class="input-group-text">CHF</span>
+                            <input asp-for="QuotaCHF" class="form-control" placeholder="0.00" step="0.01" />
+                        </div>
+                        <span asp-validation-for="QuotaCHF" class="text-danger"></span>
+                        <small class="form-text text-muted">
+                            This amount will be added to EVERY user in the specified group
+                        </small>
+                    </div>
+
+                    @* Warning message to make users aware of the impact *@
+                    <div class="alert alert-warning">
+                        <strong>⚠️ Important:</strong> This operation will add the specified quota amount to
+                        <em>all users</em> belonging to the group. Please double-check the group name and amount.
+                    </div>
+
+                    @* Form submission buttons *@
+                    <div class="form-group text-center mt-4">
+                        <button type="submit" class="btn btn-success">Add Quota to Group</button>
+                        <a asp-action="Index" class="btn btn-secondary">Return to Home</a>
+                        <a asp-action="AuthenticateByUsername" class="btn btn-outline-primary">Individual User Quota</a>
+                    </div>
+                </form>
+            </div>
+            <div class="card-footer text-muted text-center">
+                <small>This will add CHF quota to all users in the specified group simultaneously</small>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

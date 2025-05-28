@@ -1,4 +1,5 @@
 ﻿using Digitec_WebClient.Models;
+using System.Linq;
 using System.Net;
 using System.Text.Json;
 
@@ -7,7 +8,7 @@ namespace MVC_Faculties.Services
     public class PrintsystemServices : IPrintsystemServices
     {
         private readonly HttpClient _client;
-        private readonly string _baseUrl = "https://localhost:7101"; 
+        private readonly string _baseUrl = "https://localhost:7101";
 
         public PrintsystemServices(HttpClient client)
         {
@@ -50,14 +51,14 @@ namespace MVC_Faculties.Services
         {
             var url = _baseUrl + "/api/Balance/creditUsernameWithQuotaCHF";
 
-            
+
             var payload = new
             {
                 Username = quotaRequest.Username,
                 QuotaCHF = quotaRequest.QuotaCHF
             };
 
-            
+
             var response = await _client.PostAsJsonAsync(url, payload);
 
             if (response.IsSuccessStatusCode)
@@ -66,7 +67,7 @@ namespace MVC_Faculties.Services
                 Console.WriteLine($"API Response: {responseContent}");
                 var apiResponse = JsonSerializer.Deserialize<JsonElement>(responseContent);
 
-                
+
                 if (apiResponse.TryGetProperty("quotaCHFCharged", out var quotaChargedElement) &&
                     apiResponse.TryGetProperty("done", out var doneElement) &&
                     doneElement.GetBoolean())
@@ -74,10 +75,10 @@ namespace MVC_Faculties.Services
                     return new UserM
                     {
                         Username = quotaRequest.Username,
-                        Group = quotaRequest.Group, 
+                        Group = quotaRequest.Group,
                         UserID = quotaRequest.UserID,
-                        QuotaCHF = quotaChargedElement.GetDecimal(), 
-                        CopyQuota = 0 
+                        QuotaCHF = quotaChargedElement.GetDecimal(),
+                        CopyQuota = 0
                     };
                 }
                 else
@@ -86,19 +87,21 @@ namespace MVC_Faculties.Services
                 }
             }
 
-            
+
             var errorContent = await response.Content.ReadAsStringAsync();
             throw new HttpRequestException($"Creditation failed with status code: {response.StatusCode}. Error: {errorContent}");
         }
 
-        public async Task<List<UserM>> creditGroupWithQuotaCHF(string groupName)
+
+        public async Task<List<UserM>> creditGroupWithQuotaCHF(string groupName, decimal quotaCHF)
         {
             var url = _baseUrl + "/api/Balance/creditGroupWithQuotaCHF";
             var payload = new
             {
-                Group = groupName
-
+                Group = groupName,
+                QuotaCHF = quotaCHF
             };
+
             var response = await _client.PostAsJsonAsync(url, payload);
 
             if (response.IsSuccessStatusCode)
@@ -106,28 +109,40 @@ namespace MVC_Faculties.Services
                 var responseContent = await response.Content.ReadAsStringAsync();
                 Console.WriteLine($"API Response: {responseContent}");
                 var apiResponse = JsonSerializer.Deserialize<JsonElement>(responseContent);
-            }
 
-            if (apiResponse.TryGetProperty("quotaCHFCharged", out var quotaChargedElement) &&
-                apiResponse.TryGetProperty("done", out var doneElement) &&
-                doneElement.GetBoolean())
-            {
-                return new List<UserM>
+                if (apiResponse.TryGetProperty("users", out var usersElement) &&
+                    apiResponse.TryGetProperty("quotaCHFCharged", out var quotaChargedElement) &&
+                    apiResponse.TryGetProperty("done", out var doneElement) &&
+                    doneElement.GetBoolean())
                 {
-                    new UserM
+                    var userList = new List<UserM>();
+
+
+                    foreach (var userElement in usersElement.EnumerateArray())
                     {
-                        Group = groupName,
-                        QuotaCHF = quotaChargedElement.GetDecimal(),
-                        CopyQuota = 0
+                        userList.Add(new UserM
+                        {
+                            UserID = Guid.Parse(userElement.GetProperty("userID").GetString()),
+                            Username = userElement.GetProperty("username").GetString(),
+                            Group = userElement.GetProperty("group").GetString(),
+                            QuotaCHF = userElement.GetProperty("quotaCHF").GetDecimal(),
+                            CopyQuota = userElement.GetProperty("copyQuota").GetInt32()
+                        });
                     }
-                };
+
+                    return userList;
+
+                }
+                else
+                {
+                    throw new HttpRequestException($"Credit operation failed or unexpected response format: {responseContent}");
+                }
             }
             else
             {
-                throw new HttpRequestException($"Credit operation failed or unexpected response format: {responseContent}");
-
-
+                var errorContent = await response.Content.ReadAsStringAsync();
+                throw new HttpRequestException($"Creditation failed with status code: {response.StatusCode}. Error: {errorContent}");
             }
-
+        }
     }
 }

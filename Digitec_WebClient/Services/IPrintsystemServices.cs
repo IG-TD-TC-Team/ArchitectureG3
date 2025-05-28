@@ -1,4 +1,5 @@
 ﻿using Digitec_WebClient.Models;
+using Microsoft.AspNetCore.Mvc;
 
 namespace MVC_Faculties.Services
 {
@@ -8,6 +9,10 @@ namespace MVC_Faculties.Services
 
         Task<UserM> creditUsernameWithQuotaCHF(UserM quotaRequest);
 
-        Task<UserM> creditGroupWithQuotaCHF(UserM quotaRequest);
+        Task<List<UserM>> creditGroupWithQuotaCHF(string groupname, decimal amount);
+
+       
+
+
     }
 }
