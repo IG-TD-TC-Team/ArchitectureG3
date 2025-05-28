@@ -20,7 +20,12 @@ namespace MVC_POS.Services
         {
             var url = _baseUrl + "authenticateByCard";
 
-            var response = await _client.PostAsJsonAsync(url, cardID);
+            var payload = new
+            {
+                cardID = cardID
+            };
+
+            var response = await _client.PostAsJsonAsync(url, payload);
 
             var responseContent = await response.Content.ReadAsStringAsync();
 
