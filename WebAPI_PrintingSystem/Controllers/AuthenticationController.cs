@@ -102,7 +102,13 @@ namespace WebAPI_PrintingSystem.Controllers
                     // Check if authentication was successful
                     if (result.Item1.ToLower().Contains("successful access"))
                     {
-                        return Ok(new { message = result.Item1, UID = result.Item2, isStaff = result.Item3 });
+                        return Ok(new
+                        {
+                            message = result.Item1,
+                            UID = result.Item2,
+                            isStaff = result.Item3,
+                            group = result.Item4 
+                        });
                     }
                     else
                     {

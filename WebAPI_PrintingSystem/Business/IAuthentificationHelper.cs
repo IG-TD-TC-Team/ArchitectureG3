@@ -21,7 +21,11 @@ namespace WebAPI_PrintingSystem.Business
         /// </summary>
         Task<bool> checkUsername(string username);
 
-    //------------Internal Methods----------------
+        ///
+
+        Task<(string message, Guid? uid, bool isStaff, string group)> authenticateByUsernameWithStaffCheck(string username, string password);
+
+        //------------Internal Methods----------------
         /// <summary>
         /// Checks if a card exists in the database
         /// </summary>
@@ -63,10 +67,7 @@ namespace WebAPI_PrintingSystem.Business
         /// <returns></returns>
         Task<bool> isUserStaff(Guid userId);
 
-        /// <summary>
-        ///     
-
-        Task<(string, Guid?, bool)> authenticateByUsernameWithStaffCheck(string username, string password);
+        
 
 
 

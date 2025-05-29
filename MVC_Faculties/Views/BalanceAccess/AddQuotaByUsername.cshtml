@@ -1,0 +1,71 @@
+﻿@model MVC_Faculties.Models.UserM
+
+@{
+    ViewData["Title"] = "Add Quota";
+}
+
+<div class="row">
+    <div class="col-md-6 mx-auto">
+        <div class="card">
+            <div class="card-header bg-success text-white">
+                <h4>Add Quota - Welcome @Model.Username!</h4>
+            </div>
+            <div class="card-body">
+                @if (ViewBag.SuccessMessage != null)
+                {
+                    <div class="alert alert-success">
+                        <i class="fas fa-check-circle"></i> @ViewBag.SuccessMessage
+                    </div>
+                }
+
+                <div class="alert alert-info">
+                    <strong>User:</strong> @Model.Username<br>
+                    <strong>User ID:</strong> @Model.UserID<br>
+                    <strong>Group:</strong> @Model.Group
+                </div>
+
+                <form asp-action="AddQuotaByUsername" method="post">
+                    <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+
+                    <input type="hidden" asp-for="UserID" />
+                    <input type="hidden" asp-for="Username" />
+                    <input type="hidden" asp-for="CopyQuota" />
+
+                    <div class="form-group mb-3">
+                        <label asp-for="QuotaCHF" class="control-label">Quota Amount (CHF)</label>
+                        <div class="input-group">
+                            <span class="input-group-text">CHF</span>
+                            <input asp-for="QuotaCHF" class="form-control" placeholder="0.00" step="0.01" />
+                        </div>
+                        <span asp-validation-for="QuotaCHF" class="text-danger"></span>
+                        <small class="form-text text-muted">Enter the amount in Swiss Francs to add to the user's quota</small>
+                    </div>
+
+                    <div class="form-group mb-3">
+                        <label asp-for="Group" class="control-label">User Group</label>
+                        <div class="input-group">
+                            <span class="input-group-text">Group</span>
+                            <input asp-for="Group" class="form-control" readonly style="background-color: #f8f9fa;" />
+                        </div>
+                        <small class="form-text text-muted">This is automatically determined from your account</small>
+                    </div>
+
+                    <div class="form-group text-center mt-4">
+                        <button type="submit" class="btn btn-success">Add Quota</button>
+                        <a asp-action="Index" asp-controller="AuthenticationAccess" class="btn btn-secondary">Return to Home</a>
+                        <a asp-action="AuthenticateByUsername" asp-controller="AuthenticationAccess" class="btn btn-outline-primary">Add Quota for Another User</a>
+                    </div>
+                </form>
+            </div>
+            <div class="card-footer text-muted text-center">
+                <small>This will add CHF quota that can be used for printing services</small>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

@@ -1,0 +1,12 @@
+@startuml
+interface IBalanceHelper {
+    creditUIDWithQuotaCHF(userID:Guid, quotaCHF:decimal) : Task<(decimal, int, bool)>
+    creditUsernameWithQuotaCHF(username:string, quotaCHF:decimal) : Task<(decimal, bool)>
+    creditGroupWithQuotaCHF(group:string, quotaCHF:decimal) : Task<(List<User>, decimal, bool)>
+    getQuotaCHFByUID(userID:Guid) : Task<decimal>
+    additionQuotaCHF(quotaCHF:decimal, actualQuotaCHF:decimal) : decimal
+    updateQuotaCHFByUID(userID:Guid, quotaCHF:decimal) : Task<decimal>
+    convertQuotaCHFToCopyQuota(quotaCHF:decimal) : int
+    updateCopyQuotaByUID(userID:Guid, copyQuota:int) : Task<int>
+}
+@enduml

@@ -237,7 +237,7 @@ namespace WebAPI_PrintingSystem.Business
             }
         }
 
-        public async Task<(string, Guid?, bool)> authenticateByUsernameWithStaffCheck(string username, string password)
+        public async Task<(string, Guid?, bool, string)> authenticateByUsernameWithStaffCheck(string username, string password)
         {
             if (await usernameExists(username))
             {
@@ -249,26 +249,30 @@ namespace WebAPI_PrintingSystem.Business
                         {
                             var userId = await getUIDByUsername(username);
                             var isStaff = await isUserStaff(userId);
-                            return ("Successful access", userId, isStaff);
+                            var user = await _repo.Users.FirstOrDefaultAsync(u => u.UserID == userId);
+                            var userGroup = user?.Group ?? "unknown";
+
+
+                            return ("Successful access", userId, isStaff, userGroup);
                         }
                         catch (InvalidOperationException)
                         {
-                            return ("Username has no associated user ID", null, false);
+                            return ("Username has no associated user ID", null, false, "unknown");
                         }
                     }
                     else
                     {
-                        return ("Incorrect password", null, false);
+                        return ("Incorrect password", null, false, "unknown");
                     }
                 }
                 else
                 {
-                    return ("User is not active", null, false);
+                    return ("User is not active", null, false, "unknown");
                 }
             }
             else
             {
-                return ("Username not found", null, false);
+                return ("Username not found", null, false, "unknown");
             }
         }
 

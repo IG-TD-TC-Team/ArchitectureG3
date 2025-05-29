@@ -9,7 +9,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DAL", "DAL\DAL.csproj", "{F
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WebAPI_PrintingSystem", "WebAPI_PrintingSystem\WebAPI_PrintingSystem.csproj", "{3E0D556C-9946-4B24-BDEB-13898B0EE128}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MVC_Faculties", "Digitec_WebClient\MVC_Faculties.csproj", "{F14DBF4C-8B4F-473F-9EEE-9530041B1089}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MVC_Faculties", "MVC_Faculties\MVC_Faculties.csproj", "{F14DBF4C-8B4F-473F-9EEE-9530041B1089}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MVC_POS", "MVC_POS\MVC_POS.csproj", "{A67943A8-8671-4BCC-AAFC-9D4C7AAFC102}"
 EndProject
