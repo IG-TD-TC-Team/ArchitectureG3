@@ -17,13 +17,18 @@ namespace WebAPI_PrintingSystem.Controllers
             _balanceHelper = balanceHelper;
         }
 
-       
+
         [HttpPost("creditUIDWithQuotaCHF")]
-        public async Task<ActionResult<(decimal, int, bool)>> CreditUIDWithQuotaCHF(Guid userID, decimal quotaCHF)
+        public async Task<ActionResult<(decimal, int, bool)>> CreditUIDWithQuotaCHF([FromBody] CreditUIDRequest request)
         {
             try
             {
-                var result = await _balanceHelper.creditUIDWithQuotaCHF(userID, quotaCHF);
+                if (request.UserID == Guid.Empty || request.QuotaCHF <= 0)
+                {
+                    return BadRequest(new { message = "Valid UserID and a positive QuotaCHF amount are required." });
+                }
+
+                var result = await _balanceHelper.creditUIDWithQuotaCHF(request.UserID, request.QuotaCHF);
                 return Ok(new
                 {
                     NewQuotaCHF = result.Item1,
@@ -35,6 +40,13 @@ namespace WebAPI_PrintingSystem.Controllers
             {
                 return StatusCode(500, new { message = "An error occurred while crediting the user.", error = ex.Message });
             }
+        }
+
+        // Add this DTO class
+        public class CreditUIDRequest
+        {
+            public Guid UserID { get; set; }
+            public decimal QuotaCHF { get; set; }
         }
 
         [HttpPost("creditUsernameWithQuotaCHF")]

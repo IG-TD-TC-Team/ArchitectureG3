@@ -48,7 +48,7 @@ namespace MVC_POS.Controllers
                 if (authResponse.IsSuccessful)
                 {
                     // Store the user info in TempData for the next view
-                    TempData["UID"] = authResponse.UserID.ToString();
+                    TempData["UserID"] = authResponse.UserID.ToString();
                     TempData["SuccessMessage"] = authResponse.Message;
 
                     // Redirect to the AddQuotaByUID view
