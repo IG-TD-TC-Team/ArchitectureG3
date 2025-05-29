@@ -1,4 +1,4 @@
-﻿using Digitec_WebClient.Models;
+﻿using MVC_Faculties.Models;
 using System.Text.Json;
 
 namespace MVC_Faculties.Services
@@ -52,7 +52,8 @@ namespace MVC_Faculties.Services
                         Password = userAuth.Password, 
                         Message = apiResponse.GetProperty("message").GetString() ?? "",
                         UID = Guid.Parse(apiResponse.GetProperty("uid").GetString() ?? Guid.Empty.ToString()),
-                        IsStaff = apiResponse.GetProperty("isStaff").GetBoolean()
+                        IsStaff = apiResponse.GetProperty("isStaff").GetBoolean(),
+                        Group = apiResponse.GetProperty("group").GetString() ?? "unknown"
                     };
                 }
                 else
@@ -66,7 +67,8 @@ namespace MVC_Faculties.Services
                         Username = userAuth.Username,
                         Message = errorMessage,
                         UID = Guid.Empty,
-                        IsStaff = false
+                        IsStaff = false,
+                        Group = "unknown"
                     };
                 }
             }

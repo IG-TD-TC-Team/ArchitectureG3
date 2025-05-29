@@ -1,4 +1,4 @@
-﻿using Digitec_WebClient.Models;
+﻿using MVC_Faculties.Models;
 using Microsoft.AspNetCore.Mvc;
 using MVC_Faculties.Services;
 
@@ -72,6 +72,7 @@ namespace MVC_Faculties.Controllers
                     TempData["UID"] = authResponse.UID.ToString();
                     TempData["Username"] = userAuth.Username;
                     TempData["IsStaff"] = authResponse.IsStaff.ToString();
+                    TempData["Group"] = authResponse.Group;
                     TempData["SuccessMessage"] = authResponse.Message;
 
                     // Determine where to redirect the user based on their requested destination and permissions

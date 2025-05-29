@@ -1,0 +1,26 @@
+@startuml
+class BalanceController {
+    + BalanceController(balanceHelper:IBalanceHelper)
+    + <<async>> CreditUIDWithQuotaCHF(request:CreditUIDRequest) : Task<ActionResult<(decimal, int, bool)>>
+    + <<async>> CreditUsernameWithQuotaCHF(request:CreditUsernameRequest) : Task<ActionResult<(decimal, bool)>>
+    + <<async>> CreditGroupWithQuotaCHF(request:CreditUsernameRequest) : Task<ActionResult<(List<User>, decimal, bool)>>
+}
+class CreditUIDRequest {
+    + QuotaCHF : decimal <<get>> <<set>>
+}
+class CreditUsernameRequest {
+    + Username : string? <<get>> <<set>>
+    + QuotaCHF : decimal <<get>> <<set>>
+    + Group : string? <<get>> <<set>>
+}
+class CreditGroupRequest {
+    + Group : string <<get>> <<set>>
+    + QuotaCHF : decimal <<get>> <<set>>
+}
+ControllerBase <|-- BalanceController
+BalanceController --> "_balanceHelper" IBalanceHelper
+BalanceController +-- CreditUIDRequest
+CreditUIDRequest --> "UserID" Guid
+BalanceController +-- CreditUsernameRequest
+BalanceController +-- CreditGroupRequest
+@enduml

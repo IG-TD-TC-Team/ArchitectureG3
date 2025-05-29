@@ -1,4 +1,4 @@
-﻿using Digitec_WebClient.Models;
+﻿using MVC_Faculties.Models;
 using Microsoft.AspNetCore.Mvc;
 using MVC_Faculties.Services;
 
@@ -37,13 +37,15 @@ namespace MVC_Faculties.Controllers
             var model = new UserM
             {
                 UserID = Guid.Parse(TempData["UID"].ToString()),
-                Username = TempData["Username"].ToString()
+                Username = TempData["Username"].ToString(),
+                Group = TempData["Group"]?.ToString() ?? "unknown"
             };
 
             // Preserve the authentication data for the POST request that will follow
             TempData.Keep("UID");
             TempData.Keep("Username");
             TempData.Keep("IsStaff");
+            TempData.Keep("Group");
 
             // Display any success messages from previous operations
             ViewBag.SuccessMessage = TempData["SuccessMessage"];

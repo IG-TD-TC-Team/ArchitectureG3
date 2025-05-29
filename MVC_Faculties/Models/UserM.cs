@@ -1,4 +1,4 @@
-﻿namespace Digitec_WebClient.Models
+﻿namespace MVC_Faculties.Models
 {
     public class UserM
     {

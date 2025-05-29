@@ -1,4 +1,4 @@
-﻿using Digitec_WebClient.Models;
+﻿using MVC_Faculties.Models;
 using System.Text.Json;
 
 namespace MVC_Faculties.Services

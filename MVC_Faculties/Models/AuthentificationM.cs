@@ -1,4 +1,4 @@
-﻿namespace Digitec_WebClient.Models
+﻿namespace MVC_Faculties.Models
 {
     public class AuthentificationM
     {
@@ -10,5 +10,7 @@
         public string Message { get; set; } = string.Empty;
         public bool IsSuccessful => Message?.ToLower().Contains("successful access") == true;
         public bool IsStaff { get; set; }
+
+        public string Group { get; set; } = string.Empty;
     }
 }
