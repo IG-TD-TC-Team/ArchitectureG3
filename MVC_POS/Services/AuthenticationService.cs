@@ -40,7 +40,7 @@ namespace MVC_POS.Services
                 return new AuthenticationM
                 {
                     Message = apiResponse.GetProperty("message").GetString() ?? "",
-                    UserID = apiResponse.GetProperty("uid").GetGuid()
+                    UserID = Guid.Parse(apiResponse.GetProperty("uid").GetString() ?? Guid.Empty.ToString())
                 };
             }
 

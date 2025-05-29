@@ -11,7 +11,11 @@ public class Program
 
         // Add services to the container.
         builder.Services.AddControllersWithViews();
-        builder.Services.AddHttpClient<IPrintsystemServices, PrintsystemServices>();
+        //builder.Services.AddHttpClient<IPrintsystemServices, PrintsystemServices>();
+
+        builder.Services.AddHttpClient<IAuthenticationService, AuthenticationService>();
+
+        builder.Services.AddHttpClient<IBalanceService, BalanceService>();
 
         var app = builder.Build();
 

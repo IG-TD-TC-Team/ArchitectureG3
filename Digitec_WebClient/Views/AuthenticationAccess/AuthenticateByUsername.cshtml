@@ -1,0 +1,80 @@
+﻿@model Digitec_WebClient.Models.AuthentificationM
+
+@{
+    ViewData["Title"] = "Login";
+}
+
+<div class="row">
+    <div class="col-md-6 mx-auto">
+        <div class="card">
+            <div class="card-header bg-primary text-white">
+                <h4>Login to Printing System</h4>
+            </div>
+            <div class="card-body">
+                @if (ViewBag.ErrorMessage != null)
+                {
+                    <div class="alert alert-danger">
+                        @ViewBag.ErrorMessage
+                    </div>
+                }
+
+
+                @if (!string.IsNullOrEmpty(ViewBag.ReturnUrl))
+                {
+                    <div class="alert alert-info">
+                        <i class="fas fa-info-circle"></i>
+                        <strong>Authentication Required</strong><br>
+                        @if (ViewBag.ReturnUrl.ToString().Contains("AddQuotaByGroup"))
+                        {
+                            <small>You are being redirected to <strong>Group Quota Management</strong>. Staff permissions required.</small>
+                        }
+                        else if (ViewBag.ReturnUrl.ToString().Contains("AddQuotaByUsername"))
+                        {
+                            <small>You are being redirected to <strong>Individual User Management</strong>.</small>
+                        }
+                        else
+                        {
+                            <small>You will be redirected to your requested page after login.</small>
+                        }
+                    </div>
+                }
+
+                <form asp-action="AuthenticateByUsername" method="post">
+                    <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+
+
+                    @if (!string.IsNullOrEmpty(ViewBag.ReturnUrl))
+                    {
+                        <input type="hidden" name="returnUrl" value="@ViewBag.ReturnUrl" />
+                    }
+
+                    <div class="form-group mb-3">
+                        <label asp-for="Username" class="control-label"></label>
+                        <input asp-for="Username" class="form-control" placeholder="Enter your username" autofocus />
+                        <span asp-validation-for="Username" class="text-danger"></span>
+                    </div>
+
+                    <div class="form-group mb-3">
+                        <label asp-for="Password" class="control-label"></label>
+                        <input asp-for="Password" class="form-control" placeholder="Enter your password" />
+                        <span asp-validation-for="Password" class="text-danger"></span>
+                    </div>
+
+                    <div class="form-group text-center mt-4">
+                        <button type="submit" class="btn btn-success">Login</button>
+                        <a asp-action="Index" class="btn btn-secondary">Cancel</a>
+                    </div>
+                </form>
+            </div>
+            <div class="card-footer text-muted text-center">
+                <small>Please enter your credentials to access the printing system</small>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

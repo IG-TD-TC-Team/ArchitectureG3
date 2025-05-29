@@ -7,7 +7,7 @@ namespace MVC_POS.Services
     public class BalanceService : IBalanceService
     {
         private readonly HttpClient _client;
-        private readonly string _baseUrl = "https://localhost:7101api/Balance/";
+        private readonly string _baseUrl = "https://localhost:7101/api/Balance"; // ✅ Fixed: added missing slash after port
 
         public BalanceService(HttpClient client)
         {
@@ -16,12 +16,12 @@ namespace MVC_POS.Services
 
         public async Task<UserM> CreditUIDWithQuotaCHF(UserM quotaRequest)
         {
-            var url = _baseUrl + "/creditUIDWithQuotaCHF";
+            var url = $"{_baseUrl}/creditUIDWithQuotaCHF"; // ✅ Clean URL construction
 
             var payload = new
             {
-                UserID = quotaRequest.UserID,
-                QuotaCHF = quotaRequest.QuotaCHF
+                userID = quotaRequest.UserID,  // ✅ Match the API parameter name (lowercase 'u')
+                quotaCHF = quotaRequest.QuotaCHF
             };
 
             var response = await _client.PostAsJsonAsync(url, payload);
@@ -32,16 +32,17 @@ namespace MVC_POS.Services
                 Console.WriteLine($"API Response: {responseContent}");
                 var apiResponse = JsonSerializer.Deserialize<JsonElement>(responseContent);
 
-
-                if (apiResponse.TryGetProperty("quotaCHFCharged", out var quotaChargedElement) &&
+                // ✅ Match the actual API response property names (from your curl result)
+                if (apiResponse.TryGetProperty("newQuotaCHF", out var quotaElement) &&
+                    apiResponse.TryGetProperty("newPrintQuota", out var printQuotaElement) &&
                     apiResponse.TryGetProperty("done", out var doneElement) &&
                     doneElement.GetBoolean())
                 {
                     return new UserM
                     {
                         UserID = quotaRequest.UserID,
-                        QuotaCHF = quotaChargedElement.GetDecimal(),
-                        CopyQuota = 0
+                        QuotaCHF = quotaElement.GetDecimal(),
+                        CopyQuota = printQuotaElement.GetInt32()
                     };
                 }
                 else

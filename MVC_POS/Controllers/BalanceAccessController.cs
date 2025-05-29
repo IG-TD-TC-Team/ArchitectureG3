@@ -56,10 +56,10 @@ namespace MVC_POS.Controllers
                 var result = await _balanceService.CreditUIDWithQuotaCHF(creditRequest);
 
                 // Store success information
-                TempData["TransactionSuccess"] = true;
-                TempData["AmountAdded"] = model.QuotaCHF;
-                TempData["NewQuotaCHF"] = result.QuotaCHF;
-                TempData["NewPrintQuota"] = result.CopyQuota;
+                TempData["TransactionSuccess"] = "true";
+                TempData["AmountAdded"] = model.QuotaCHF.ToString("F2");      // Convert decimal to string
+                TempData["NewQuotaCHF"] = result.QuotaCHF.ToString("F2");     // Convert decimal to string
+                TempData["NewPrintQuota"] = result.CopyQuota.ToString();
 
                 return RedirectToAction("Summary");
             }
@@ -82,9 +82,9 @@ namespace MVC_POS.Controllers
 
             var model = new TransactionM
             {
-                AmountCredited = (decimal)(TempData["AmountAdded"] ?? 0),
-                NewQuotaCHF = (decimal)(TempData["NewQuotaCHF"] ?? 0),
-                NewPrintQuota = (int)(TempData["NewPrintQuota"] ?? 0),
+                AmountCredited = decimal.Parse(TempData["AmountAdded"]?.ToString() ?? "0"),
+                NewQuotaCHF = decimal.Parse(TempData["NewQuotaCHF"]?.ToString() ?? "0"),
+                NewPrintQuota = int.Parse(TempData["NewPrintQuota"]?.ToString() ?? "0"),
                 IsSuccessful = true,
                 Message = "Transaction completed successfully"
             };
