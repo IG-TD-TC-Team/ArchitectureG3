@@ -5,11 +5,11 @@
 
 <div class="text-center">
     <h1 class="display-4">Welcome to the Printing System POS</h1>
-    <p>Please authenticate with your card to begin.</p>
+    <p>Please authenticate with your card to begin adding credit to your account.</p>
 
     <div class="mt-4">
         <a asp-controller="AuthenticationAccess" asp-action="AuthenticateByCard" class="btn btn-primary btn-lg">
-            Scan Card
+            <i class="fas fa-credit-card"></i> Scan Card
         </a>
     </div>
 </div>
@@ -18,7 +18,7 @@
     <div class="col-md-6">
         <div class="card">
             <div class="card-header">
-                <h5>Point of Sale</h5>
+                <h5><i class="fas fa-cash-register"></i> Point of Sale</h5>
             </div>
             <div class="card-body">
                 <p>Add funds to your printing account using your card.</p>
@@ -26,21 +26,33 @@
                     <li>Scan your card to authenticate</li>
                     <li>Enter the amount to add to your account</li>
                     <li>Confirm the transaction</li>
+                    <li>Get a summary of your updated balance</li>
                 </ul>
+                <div class="mt-3">
+                    <a asp-controller="AuthenticationAccess" asp-action="AuthenticateByCard" class="btn btn-outline-primary">
+                        Get Started
+                    </a>
+                </div>
             </div>
         </div>
     </div>
     <div class="col-md-6">
         <div class="card">
             <div class="card-header">
-                <h5>System Information</h5>
+                <h5><i class="fas fa-info-circle"></i> System Information</h5>
             </div>
             <div class="card-body">
                 <p>The current rate for printing is:</p>
                 <ul>
-                    <li>A4 Black & White: 0.08 CHF per page</li>
+                    <li><strong>A4 Black & White:</strong> 0.08 CHF per page</li>
+                    <li><strong>Minimum credit:</strong> 0.01 CHF</li>
+                    <li><strong>Maximum credit:</strong> 1000.00 CHF</li>
                 </ul>
                 <p>For any issues with the system, please contact the administrator.</p>
+
+                <div class="alert alert-info mt-3">
+                    <small><strong>Note:</strong> Credit expires after 4 years from the date of addition.</small>
+                </div>
             </div>
         </div>
     </div>

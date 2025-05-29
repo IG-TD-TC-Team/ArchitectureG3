@@ -3,20 +3,42 @@
     Layout = "_Layout";
 }
 
-<h2>Scan Your Card</h2>
+<div class="row">
+    <div class="col-md-6 mx-auto">
+        <div class="card">
+            <div class="card-header bg-primary text-white">
+                <h4>Scan Your Card</h4>
+            </div>
+            <div class="card-body">
+                <div class="alert alert-info">
+                    <i class="fas fa-credit-card"></i>
+                    <strong>Card Authentication Required</strong><br>
+                    <small>Please enter your card ID to access the printing system.</small>
+                </div>
 
-<div asp-validation-summary="All" class="text-danger"></div>
+                <form asp-controller="AuthenticationAccess" asp-action="AuthenticateByCard" method="post">
+                    <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
 
-<form asp-controller="AuthenticationAccess" asp-action="AuthenticateByCard" method="post">
-    <div class="form-group">
-        <label for="cardID">Card ID</label>
-        <input type="text" id="cardID" name="cardID" class="form-control" />
+                    <div class="form-group mb-3">
+                        <label for="cardID" class="control-label">Card ID</label>
+                        <input type="text" id="cardID" name="cardID" class="form-control" placeholder="Enter your card ID" autofocus />
+                        <small class="form-text text-muted">This should be the unique identifier printed on your card</small>
+                    </div>
+
+                    <div class="form-group text-center mt-4">
+                        <button type="submit" class="btn btn-primary btn-lg">
+                            <i class="fas fa-check"></i> Authenticate
+                        </button>
+                        <a asp-action="Index" class="btn btn-secondary">Cancel</a>
+                    </div>
+                </form>
+            </div>
+            <div class="card-footer text-muted text-center">
+                <small>Your card will be validated against the printing system database</small>
+            </div>
+        </div>
     </div>
-
-    <div class="form-group">
-        <input type="submit" value="Authenticate" class="btn btn-primary" />
-    </div>
-</form>
+</div>
 
 @section Scripts {
     @{

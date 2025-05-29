@@ -52,7 +52,7 @@ namespace MVC_POS.Controllers
                     TempData["SuccessMessage"] = authResponse.Message;
 
                     // Redirect to the AddQuotaByUID view
-                    return RedirectToAction("AddQuotaByUID");
+                    return RedirectToAction("AddQuotaByUID", "BalanceAccess");
                 }
                 else
                 {
