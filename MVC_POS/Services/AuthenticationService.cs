@@ -3,6 +3,7 @@ using MVC_POS.Models;
 using System;
 using System.Threading.Tasks;
 using System.Text.Json;
+using Microsoft.AspNetCore.Authentication;
 
 namespace MVC_POS.Services
 {
@@ -29,6 +30,9 @@ namespace MVC_POS.Services
 
             var responseContent = await response.Content.ReadAsStringAsync();
 
+            Console.WriteLine($"API Response Status: {response.StatusCode}");
+            Console.WriteLine($"API Response Content: {responseContent}");
+
             if (response.IsSuccessStatusCode)
             {
                 var apiResponse = JsonSerializer.Deserialize<JsonElement>(responseContent);
@@ -36,7 +40,7 @@ namespace MVC_POS.Services
                 return new AuthenticationM
                 {
                     Message = apiResponse.GetProperty("message").GetString() ?? "",
-                    UserID = apiResponse.GetProperty("UID").GetGuid()
+                    UserID = apiResponse.GetProperty("uid").GetGuid()
                 };
             }
 

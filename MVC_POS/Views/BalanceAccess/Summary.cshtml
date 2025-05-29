@@ -1,0 +1,82 @@
+﻿@model MVC_POS.Models.TransactionM
+
+@{
+    ViewData["Title"] = "Transaction Summary";
+    Layout = "_Layout";
+}
+
+<div class="row">
+    <div class="col-md-8 mx-auto">
+        <div class="card">
+            <div class="card-header bg-success text-white">
+                <h4><i class="fas fa-check-circle"></i> Transaction Complete</h4>
+            </div>
+            <div class="card-body">
+                <div class="alert alert-success">
+                    <h5 class="alert-heading">✅ Credit Added Successfully!</h5>
+                    <p class="mb-0">Your printing account has been updated with the new credit.</p>
+                </div>
+
+                <h5 class="mt-4">Transaction Details</h5>
+                <div class="card bg-light">
+                    <div class="card-body">
+                        <dl class="row mb-0">
+                            <dt class="col-sm-4">Amount Added:</dt>
+                            <dd class="col-sm-8">
+                                <strong class="text-success">@Model.AmountCredited.ToString("C")</strong>
+                            </dd>
+
+                            <dt class="col-sm-4">New Quota Balance:</dt>
+                            <dd class="col-sm-8">
+                                <strong class="text-primary">@Model.NewQuotaCHF.ToString("C")</strong>
+                            </dd>
+
+                            <dt class="col-sm-4">Available Print Pages:</dt>
+                            <dd class="col-sm-8">
+                                <span class="badge bg-info">@Model.NewPrintQuota pages</span>
+                            </dd>
+
+                            <dt class="col-sm-4">Transaction Date:</dt>
+                            <dd class="col-sm-8">@Model.TransactionDate.ToString("dd/MM/yyyy HH:mm")</dd>
+                        </dl>
+                    </div>
+                </div>
+
+                <div class="alert alert-info mt-4">
+                    <strong>Printing Information:</strong><br>
+                    <ul class="mb-0">
+                        <li>A4 Black & White: 0.08 CHF per page</li>
+                        <li>Your account is now ready for printing</li>
+                        <li>Credit expires after 4 years from addition date</li>
+                    </ul>
+                </div>
+
+                <div class="card border-secondary mt-4">
+                    <div class="card-header bg-secondary text-white">
+                        <h6 class="mb-0">What would you like to do next?</h6>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <h6>For This Session</h6>
+                                <div class="d-grid gap-2">
+                                    <a asp-controller="AuthenticationAccess" asp-action="AuthenticateByCard" class="btn btn-primary btn-sm">
+                                        Process Another Card
+                                    </a>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <h6>Navigation</h6>
+                                <div class="d-grid gap-2">
+                                    <a asp-controller="AuthenticationAccess" asp-action="Index" class="btn btn-success btn-sm">
+                                        Return to Main Menu
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

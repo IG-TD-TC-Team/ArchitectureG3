@@ -1,0 +1,64 @@
+﻿@model MVC_POS.Models.BalanceM
+
+@{
+    ViewData["Title"] = "Add Credit";
+    Layout = "_Layout";
+}
+
+<div class="row">
+    <div class="col-md-6 mx-auto">
+        <div class="card">
+            <div class="card-header bg-success text-white">
+                <h4>Add Printing Credit</h4>
+            </div>
+            <div class="card-body">
+                @if (ViewBag.SuccessMessage != null)
+                {
+                    <div class="alert alert-success">
+                        <i class="fas fa-check-circle"></i> @ViewBag.SuccessMessage
+                    </div>
+                }
+
+                <div class="alert alert-info">
+                    <strong>Card authenticated successfully!</strong><br>
+                    <small>You can now add credit to your printing account.</small>
+                </div>
+
+                <form asp-controller="BalanceAccess" asp-action="AddQuotaByUID" method="post">
+                    <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+
+                    <input type="hidden" asp-for="UserID" />
+
+                    <div class="form-group mb-3">
+                        <label asp-for="QuotaCHF" class="control-label"></label>
+                        <div class="input-group">
+                            <span class="input-group-text">CHF</span>
+                            <input asp-for="QuotaCHF" class="form-control" placeholder="0.00" step="0.01" min="0.01" max="1000" />
+                        </div>
+                        <span asp-validation-for="QuotaCHF" class="text-danger"></span>
+                        <small class="form-text text-muted">Enter the amount in Swiss Francs to add to your printing account</small>
+                    </div>
+
+                    <div class="alert alert-warning">
+                        <strong>Current Rate:</strong> A4 Black & White printing costs 0.08 CHF per page
+                    </div>
+
+                    <div class="form-group text-center mt-4">
+                        <button type="submit" class="btn btn-success">Add Credit</button>
+                        <a asp-controller="AuthenticationAccess" asp-action="AuthenticateByCard" class="btn btn-secondary">Use Different Card</a>
+                        <a asp-controller="AuthenticationAccess" asp-action="Index" class="btn btn-outline-primary">Cancel</a>
+                    </div>
+                </form>
+            </div>
+            <div class="card-footer text-muted text-center">
+                <small>This will add CHF credit that can be used for printing services</small>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}
