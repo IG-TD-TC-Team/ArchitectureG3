@@ -79,8 +79,8 @@
 
                     <div class="mt-auto">
 
-                        <a asp-action="AddQuotaByUsername" class="btn btn-primary btn-lg">
-                            <i class="fas fa-user-plus"></i> Manage Individual User
+                        <a asp-controller="BalanceAccess" asp-action="AddQuotaByUsername" class="btn btn-primary">
+                            Manage Individual User
                         </a>
                     </div>
                 </div>
@@ -141,8 +141,8 @@
                         @if (TempData["IsStaff"]?.ToString() == "True")
                         {
                             <!-- User is already authenticated and has staff permissions -->
-                            <a asp-action="AddQuotaByGroup" class="btn btn-success btn-lg">
-                                <i class="fas fa-users-cog"></i> Manage Group Quota
+                            <a asp-controller="BalanceAccess" asp-action="AddQuotaByGroup" class="btn btn-warning">
+                                Manage Group Quota
                             </a>
                         }
                         else if (TempData["Username"] != null)
@@ -155,8 +155,8 @@
                         else
                         {
                             <!-- SIMPLE: Direct link - will auto-redirect to auth if needed -->
-                            <a asp-action="AddQuotaByGroup" class="btn btn-warning btn-lg">
-                                <i class="fas fa-users-cog"></i> Manage Group Quota
+                            <a asp-controller="BalanceAccess" asp-action="AddQuotaByGroup" class="btn btn-warning">
+                                Manage Group Quota
                             </a>
                         }
                     </div>

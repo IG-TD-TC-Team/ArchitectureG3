@@ -23,12 +23,12 @@
                     <strong>User ID:</strong> @Model.UserID
                 </div>
 
+                
                 <form asp-action="AddQuotaByUsername" method="post">
                     <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
 
                     <input type="hidden" asp-for="UserID" />
                     <input type="hidden" asp-for="Username" />
-
                     <input type="hidden" asp-for="CopyQuota" />
 
                     <div class="form-group mb-3">
@@ -42,20 +42,24 @@
                     </div>
 
                     <div class="form-group mb-3">
-                        <label asp-for="Group " class="control-label"></label>
+                        <label asp-for="Group" class="control-label"></label>
                         <div class="input-group">
                             <span class="input-group-text">GroupName</span>
                             <input asp-for="Group" />
                         </div>
-                        <span asp-validation-for="QuotaCHF" class="text-danger"></span>
+                        <!-- Validates the Group field-->
+                        <span asp-validation-for="Group" class="text-danger"></span>
                         <small class="form-text text-muted">Enter the name of the group that you belong to</small>
                     </div>
 
-
                     <div class="form-group text-center mt-4">
                         <button type="submit" class="btn btn-success">Add Quota</button>
-                        <a asp-action="Index" class="btn btn-secondary">Return to Home</a>
-                        <a asp-action="AuthenticateByUsername" class="btn btn-outline-primary">Add Quota for Another User</a>
+
+                        <!-- Index mapping -->
+                        <a asp-controller="AuthenticationAccess" asp-action="Index" class="btn btn-secondary">Return to Home</a>
+
+                        <!-- AuthenticateByUsername mapping  -->
+                        <a asp-controller="AuthenticationAccess" asp-action="AuthenticateByUsername" class="btn btn-outline-primary">Add Quota for Another User</a>
                     </div>
                 </form>
             </div>

@@ -14,7 +14,6 @@
                 </div>
 
                 <h5 class="mt-4">Transaction Summary</h5>
-
                 <dl class="row mt-3">
                     <dt class="col-sm-4">User:</dt>
                     <dd class="col-sm-8">@ViewBag.Username</dd>
@@ -31,8 +30,11 @@
                 </div>
             </div>
             <div class="card-footer text-center">
-                <a asp-action="AuthenticateByUsername" class="btn btn-primary">Add Quota for Another User</a>
-                <a asp-action="Index" class="btn btn-success">Return to Home</a>
+                <!-- AuthenticateByUsername mapping -->
+                <a asp-controller="AuthenticationAccess" asp-action="AuthenticateByUsername" class="btn btn-primary">Add Quota for Another User</a>
+
+                <!-- Index mapping -->
+                <a asp-controller="AuthenticationAccess" asp-action="Index" class="btn btn-success">Return to Home</a>
             </div>
         </div>
     </div>

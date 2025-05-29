@@ -11,6 +11,7 @@ public class Program
 
         // Add services to the container.
         builder.Services.AddControllersWithViews();
+        
         //builder.Services.AddHttpClient<IPrintsystemServices, PrintsystemServices>();
 
         builder.Services.AddHttpClient<IAuthenticationService, AuthenticationService>();
@@ -36,7 +37,7 @@ public class Program
 
         app.MapControllerRoute(
             name: "default",
-            pattern: "{controller=PrintsystemAccess}/{action=Index}/{id?}");
+            pattern: "{controller=AuthenticationAccess}/{action=Index}/{id?}");
 
         app.Run();
     }
