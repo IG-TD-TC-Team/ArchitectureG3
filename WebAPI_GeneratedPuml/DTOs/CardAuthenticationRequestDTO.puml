@@ -1,0 +1,5 @@
+@startuml
+class CardAuthenticationRequestDTO {
+}
+CardAuthenticationRequestDTO --> "CardID" Guid
+@enduml

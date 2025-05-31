@@ -1,6 +1,0 @@
-@startuml
-class BalanceM {
-    + Amount : decimal <<get>> <<set>>
-}
-BalanceM --> "UserId" Guid
-@enduml

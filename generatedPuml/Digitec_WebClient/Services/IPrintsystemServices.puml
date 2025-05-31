@@ -1,6 +1,0 @@
-@startuml
-interface IPrintsystemServices {
-    AuthenticateByUsername(userAuth:AuthentificationM) : Task<AuthentificationM>
-    creditUsernameWithQuotaCHF(user:UserM) : Task<UserM>
-}
-@enduml

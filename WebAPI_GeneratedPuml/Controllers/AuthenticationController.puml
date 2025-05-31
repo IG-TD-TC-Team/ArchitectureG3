@@ -2,17 +2,9 @@
 class AuthenticationController {
     + AuthenticationController(authentificationHelper:IAuthentificationHelper)
     + <<async>> checkUsername(username:string) : Task<ActionResult<Guid>>
-    + <<async>> AuthenticateByCard(request:CardAuthenticationRequest) : Task<ActionResult>
-    + <<async>> AuthenticateByUsername(request:AuthenticationRequest) : Task<ActionResult>
-}
-class AuthenticationRequest {
-    + Username : string <<get>> <<set>>
-    + Password : string <<get>> <<set>>
-}
-class CardAuthenticationRequest {
+    + <<async>> AuthenticateByCard(request:CardAuthenticationRequestDTO) : Task<ActionResult>
+    + <<async>> AuthenticateByUsername(request:AuthenticationRequestDTO) : Task<ActionResult>
 }
 ControllerBase <|-- AuthenticationController
 AuthenticationController --> "_authentificationHelper" IAuthentificationHelper
-AuthenticationController +-- CardAuthenticationRequest
-CardAuthenticationRequest --> "cardID" Guid
 @enduml

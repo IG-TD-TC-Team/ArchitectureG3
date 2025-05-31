@@ -1,0 +1,6 @@
+@startuml
+class CreditGroupRequestDTO {
+    + Group : string <<get>> <<set>>
+    + QuotaCHF : decimal <<get>> <<set>>
+}
+@enduml

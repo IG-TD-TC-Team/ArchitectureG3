@@ -1,0 +1,7 @@
+@startuml
+class CreditUsernameRequestDTO {
+    + Username : string? <<get>> <<set>>
+    + QuotaCHF : decimal <<get>> <<set>>
+    + Group : string? <<get>> <<set>>
+}
+@enduml

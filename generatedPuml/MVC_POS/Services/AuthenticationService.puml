@@ -1,9 +1,0 @@
-@startuml
-class AuthenticationService {
-    - <<readonly>> _baseUrl : string = "https://localhost:7101"
-    + AuthenticationService(client:HttpClient)
-    + <<async>> AuthenticateByCardAsync(cardId:Guid) : Task<AuthenticationM>
-}
-IAuthenticationService <|-- AuthenticationService
-AuthenticationService --> "_client" HttpClient
-@enduml

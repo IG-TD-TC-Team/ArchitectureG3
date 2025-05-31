@@ -1,6 +1,0 @@
-@startuml
-interface IBalanceService {
-    CreditUserWithQuotaCHFAsync(userId:Guid, quotaCHF:decimal) : Task<UserM>
-    GetUserBalanceAsync(userId:Guid) : Task<UserM>
-}
-@enduml

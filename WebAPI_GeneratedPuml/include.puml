@@ -61,41 +61,37 @@ interface IBalanceHelper {
 class AuthenticationController {
     + AuthenticationController(authentificationHelper:IAuthentificationHelper)
     + <<async>> checkUsername(username:string) : Task<ActionResult<Guid>>
-    + <<async>> AuthenticateByCard(request:CardAuthenticationRequest) : Task<ActionResult>
-    + <<async>> AuthenticateByUsername(request:AuthenticationRequest) : Task<ActionResult>
-}
-class AuthenticationRequest {
-    + Username : string <<get>> <<set>>
-    + Password : string <<get>> <<set>>
-}
-class CardAuthenticationRequest {
+    + <<async>> AuthenticateByCard(request:CardAuthenticationRequestDTO) : Task<ActionResult>
+    + <<async>> AuthenticateByUsername(request:AuthenticationRequestDTO) : Task<ActionResult>
 }
 ControllerBase <|-- AuthenticationController
 AuthenticationController --> "_authentificationHelper" IAuthentificationHelper
-AuthenticationController +-- CardAuthenticationRequest
-CardAuthenticationRequest --> "cardID" Guid
 class BalanceController {
     + BalanceController(balanceHelper:IBalanceHelper)
-    + <<async>> CreditUIDWithQuotaCHF(request:CreditUIDRequest) : Task<ActionResult<(decimal, int, bool)>>
-    + <<async>> CreditUsernameWithQuotaCHF(request:CreditUsernameRequest) : Task<ActionResult<(decimal, bool)>>
-    + <<async>> CreditGroupWithQuotaCHF(request:CreditUsernameRequest) : Task<ActionResult<(List<User>, decimal, bool)>>
+    + <<async>> CreditUIDWithQuotaCHF(request:CreditUIDRequestDTO) : Task<ActionResult<(decimal, int, bool)>>
+    + <<async>> CreditUsernameWithQuotaCHF(request:CreditUsernameRequestDTO) : Task<ActionResult<(decimal, bool)>>
+    + <<async>> CreditGroupWithQuotaCHF(request:CreditGroupRequestDTO) : Task<ActionResult<(List<User>, decimal, bool)>>
 }
-class CreditUIDRequest {
+ControllerBase <|-- BalanceController
+BalanceController --> "_balanceHelper" IBalanceHelper
+class AuthenticationRequestDTO {
+    + Username : string <<get>> <<set>>
+    + Password : string <<get>> <<set>>
+}
+class CardAuthenticationRequestDTO {
+}
+CardAuthenticationRequestDTO --> "CardID" Guid
+class CreditGroupRequestDTO {
+    + Group : string <<get>> <<set>>
     + QuotaCHF : decimal <<get>> <<set>>
 }
-class CreditUsernameRequest {
+class CreditUIDRequestDTO {
+    + QuotaCHF : decimal <<get>> <<set>>
+}
+CreditUIDRequestDTO --> "UserID" Guid
+class CreditUsernameRequestDTO {
     + Username : string? <<get>> <<set>>
     + QuotaCHF : decimal <<get>> <<set>>
     + Group : string? <<get>> <<set>>
 }
-class CreditGroupRequest {
-    + Group : string <<get>> <<set>>
-    + QuotaCHF : decimal <<get>> <<set>>
-}
-ControllerBase <|-- BalanceController
-BalanceController --> "_balanceHelper" IBalanceHelper
-BalanceController +-- CreditUIDRequest
-CreditUIDRequest --> "UserID" Guid
-BalanceController +-- CreditUsernameRequest
-BalanceController +-- CreditGroupRequest
 @enduml
