@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System.ComponentModel.DataAnnotations;
 using WebAPI_PrintingSystem.Business;
+using WebAPI_PrintingSystem.DTOs;
 
 namespace WebAPI_PrintingSystem.Controllers
 {
@@ -19,7 +20,7 @@ namespace WebAPI_PrintingSystem.Controllers
 
 
         [HttpPost("creditUIDWithQuotaCHF")]
-        public async Task<ActionResult<(decimal, int, bool)>> CreditUIDWithQuotaCHF([FromBody] CreditUIDRequest request)
+        public async Task<ActionResult<(decimal, int, bool)>> CreditUIDWithQuotaCHF([FromBody] CreditUIDRequestDTO request)
         {
             try
             {
@@ -42,15 +43,9 @@ namespace WebAPI_PrintingSystem.Controllers
             }
         }
 
-        // Add this DTO class
-        public class CreditUIDRequest
-        {
-            public Guid UserID { get; set; }
-            public decimal QuotaCHF { get; set; }
-        }
-
+  
         [HttpPost("creditUsernameWithQuotaCHF")]
-        public async Task<ActionResult<(decimal, bool)>> CreditUsernameWithQuotaCHF([FromBody] CreditUsernameRequest request)
+        public async Task<ActionResult<(decimal, bool)>> CreditUsernameWithQuotaCHF([FromBody] CreditUsernameRequestDTO request)
         {
             try
             {
@@ -75,7 +70,7 @@ namespace WebAPI_PrintingSystem.Controllers
             }
         }
         [HttpPost("creditGroupWithQuotaCHF")]
-        public async Task<ActionResult<(List<User>, decimal, bool)>> CreditGroupWithQuotaCHF([FromBody] CreditUsernameRequest request)
+        public async Task<ActionResult<(List<User>, decimal, bool)>> CreditGroupWithQuotaCHF([FromBody] CreditGroupRequestDTO request)
         {
             try
             {
@@ -95,25 +90,6 @@ namespace WebAPI_PrintingSystem.Controllers
             {
                 return StatusCode(500, new { message = "An error occurred while crediting the group.", error = ex.Message });
             }
-        }
-
-
-
-        // DTO for credit username with quota CHF request
-        public class CreditUsernameRequest
-        {
-            public string? Username { get; set; }
-            public decimal QuotaCHF { get; set; }
-            public string? Group { get; set; }
-        }
-
-        public class CreditGroupRequest
-        {
-            
-            public string Group { get; set; }
-
-         
-            public decimal QuotaCHF { get; set; }
         }
 
     }

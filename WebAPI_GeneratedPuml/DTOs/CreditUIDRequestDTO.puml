@@ -1,0 +1,6 @@
+@startuml
+class CreditUIDRequestDTO {
+    + QuotaCHF : decimal <<get>> <<set>>
+}
+CreditUIDRequestDTO --> "UserID" Guid
+@enduml

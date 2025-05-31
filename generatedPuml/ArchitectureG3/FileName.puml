@@ -1,7 +1,0 @@
-@startuml
-class DiagramGenerator {
-    + DiagramGenerator()
-    + <<async>> GenerateDiagramAsync(plantUmlText:string, outputPath:string) : Task
-}
-DiagramGenerator --> "_renderer" IPlantUmlRenderer
-@enduml

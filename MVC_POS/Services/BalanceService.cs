@@ -7,7 +7,7 @@ namespace MVC_POS.Services
     public class BalanceService : IBalanceService
     {
         private readonly HttpClient _client;
-        private readonly string _baseUrl = "https://localhost:7101/api/Balance"; // ✅ Fixed: added missing slash after port
+        private readonly string _baseUrl = "https://webapiprintingsystem20250530105714-djb6ebg0d6c4geaq.switzerlandnorth-01.azurewebsites.net/api/Balance";
 
         public BalanceService(HttpClient client)
         {
@@ -16,11 +16,11 @@ namespace MVC_POS.Services
 
         public async Task<UserM> CreditUIDWithQuotaCHF(UserM quotaRequest)
         {
-            var url = $"{_baseUrl}/creditUIDWithQuotaCHF"; // ✅ Clean URL construction
+            var url = $"{_baseUrl}/creditUIDWithQuotaCHF"; 
 
             var payload = new
             {
-                userID = quotaRequest.UserID,  // ✅ Match the API parameter name (lowercase 'u')
+                userID = quotaRequest.UserID,  
                 quotaCHF = quotaRequest.QuotaCHF
             };
 
@@ -32,7 +32,7 @@ namespace MVC_POS.Services
                 Console.WriteLine($"API Response: {responseContent}");
                 var apiResponse = JsonSerializer.Deserialize<JsonElement>(responseContent);
 
-                // ✅ Match the actual API response property names (from your curl result)
+                
                 if (apiResponse.TryGetProperty("newQuotaCHF", out var quotaElement) &&
                     apiResponse.TryGetProperty("newPrintQuota", out var printQuotaElement) &&
                     apiResponse.TryGetProperty("done", out var doneElement) &&

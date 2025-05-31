@@ -1,7 +1,0 @@
-@startuml
-class AuthentificationM {
-    + Username : string <<get>> <<set>>
-    + Password : string <<get>> <<set>>
-}
-AuthentificationM --> "UID" Guid
-@enduml

@@ -10,7 +10,7 @@ namespace MVC_Faculties.Services
     public class AuthenticationService : IAuthenticationService
     {
         private readonly HttpClient _client;
-        private readonly string _baseUrl = "https://localhost:7101";
+        private readonly string _baseUrl = "https://webapiprintingsystem20250530105714-djb6ebg0d6c4geaq.switzerlandnorth-01.azurewebsites.net/";
 
         public AuthenticationService(HttpClient client)
         {

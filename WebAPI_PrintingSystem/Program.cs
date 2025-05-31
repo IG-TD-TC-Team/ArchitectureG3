@@ -1,4 +1,3 @@
-
 using DAL;
 using Microsoft.EntityFrameworkCore;
 using WebAPI_PrintingSystem.Business;
@@ -12,32 +11,28 @@ namespace WebAPI_PrintingSystem
             var builder = WebApplication.CreateBuilder(args);
 
             // Add services to the container.
-
             builder.Services.AddControllers();
-            // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
             builder.Services.AddScoped<IAuthentificationHelper, AuthenticationHelper>();
             builder.Services.AddScoped<IBalanceHelper, BalanceHelper>();
 
-            // Register the database context with dependency injection
+            // Register the database context with Azure SQL connection
             builder.Services.AddDbContext<PrintingSystemContext>(options =>
-                options.UseSqlServer(@"Server=(localdb)\mssqllocaldb;Database=PrintingSystemDB;Trusted_Connection=True"));
+                options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
             var app = builder.Build();
 
-            // Configure the HTTP request pipeline.
-            if (app.Environment.IsDevelopment())
+            //Enable Swagger in all environments for testing
+            app.UseSwagger();
+            app.UseSwaggerUI(c =>
             {
-                app.UseSwagger();
-                app.UseSwaggerUI();
-            }
+                c.SwaggerEndpoint("/swagger/v1/swagger.json", "Printing System API V1");
+                c.RoutePrefix = "swagger"; // Swagger will be available at /swagger
+            });
 
             app.UseHttpsRedirection();
-
             app.UseAuthorization();
-
-
             app.MapControllers();
 
             app.Run();

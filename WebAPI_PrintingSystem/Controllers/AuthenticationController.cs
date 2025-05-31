@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using WebAPI_PrintingSystem.Business;
+using WebAPI_PrintingSystem.DTOs;
 
 namespace WebAPI_PrintingSystem.Controllers
 {
@@ -33,19 +34,19 @@ namespace WebAPI_PrintingSystem.Controllers
         }
 
         [HttpPost("authenticateByCard")]
-        public async Task<ActionResult> AuthenticateByCard([FromBody] CardAuthenticationRequest request)
+        public async Task<ActionResult> AuthenticateByCard([FromBody] CardAuthenticationRequestDTO request)
         {
             try
             {
                 // Validate input 
-                if (request.cardID == Guid.Empty)
+                if (request.CardID == Guid.Empty)
                 {
                     return BadRequest(new { message = "Card ID is required." });
                 }
 
                 try
                 {
-                    var result = await _authentificationHelper.authenticateByCard(request.cardID);
+                    var result = await _authentificationHelper.authenticateByCard(request.CardID);
 
                     // Check if authentication was successful
                     if (result.Item1.ToLower().Contains("successful access"))
@@ -73,19 +74,14 @@ namespace WebAPI_PrintingSystem.Controllers
             }
             catch (Exception ex)
             {
-                // Log the exception if you have logging in place
+                // Log the exception
                 return StatusCode(500, new { message = "An error occurred during authentication.", error = ex.Message });
             }
         }
 
-        // DTO for card authentication
-        public class CardAuthenticationRequest
-        {
-            public Guid cardID { get; set; }
-        }
 
         [HttpPost("authenticateByUsername")]
-        public async Task<ActionResult> AuthenticateByUsername([FromBody] AuthenticationRequest request)
+        public async Task<ActionResult> AuthenticateByUsername([FromBody] AuthenticationRequestDTO request)
         {
             try
             {
@@ -127,12 +123,7 @@ namespace WebAPI_PrintingSystem.Controllers
         }
     }
 
-    // DTO for username/password authentication
-    public class AuthenticationRequest
-    {
-        public string Username { get; set; }
-        public string Password { get; set; }
-    }
+
 
 
 }
