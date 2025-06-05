@@ -1,6 +1,7 @@
 ﻿using MVC_Faculties.Models;
 using Microsoft.AspNetCore.Mvc;
 using MVC_Faculties.Services;
+using MVC_Faculties.Extensions;
 
 namespace MVC_Faculties.Controllers
 {
@@ -25,27 +26,22 @@ namespace MVC_Faculties.Controllers
         [HttpGet]
         public IActionResult AddQuotaByUsername()
         {
-            // Verify that we have authentication information from the previous authentication step
-            if (TempData["UID"] == null || TempData["Username"] == null)
+            // Users stay logged in across multiple operations
+            if (!HttpContext.Session.IsAuthenticated())
             {
-                // User is not authenticated - redirect them to authentication with a return URL
                 var returnUrl = Url.Action("AddQuotaByUsername", "BalanceAccess");
-                return RedirectToAction("AuthenticateByUsername", "AuthenticationAccess", new { returnUrl = returnUrl });
+                return RedirectToAction("AuthenticateByUsername", "AuthenticationAccess",
+                    new { returnUrl = returnUrl });
             }
 
             // Create a model with the authenticated user's information
             var model = new UserM
             {
-                UserID = Guid.Parse(TempData["UID"].ToString()),
-                Username = TempData["Username"].ToString(),
-                Group = TempData["Group"]?.ToString() ?? "unknown"
+                UserID = HttpContext.Session.GetUserId()!.Value,
+                Username = HttpContext.Session.GetUsername()!,
+                Group = HttpContext.Session.GetUserGroup() ?? "unknown"
             };
 
-            // Preserve the authentication data for the POST request that will follow
-            TempData.Keep("UID");
-            TempData.Keep("Username");
-            TempData.Keep("IsStaff");
-            TempData.Keep("Group");
 
             // Display any success messages from previous operations
             ViewBag.SuccessMessage = TempData["SuccessMessage"];
@@ -62,6 +58,13 @@ namespace MVC_Faculties.Controllers
         [HttpPost]
         public async Task<IActionResult> AddQuotaByUsername(UserM quotaRequest)
         {
+
+            // Verify authentication is still valid
+            if (!HttpContext.Session.IsAuthenticated())
+            {
+                return RedirectToAction("AuthenticateByUsername", "AuthenticationAccess");
+            }
+
             // Validate that all required information is present and correct
             if (!ModelState.IsValid)
             {
@@ -114,20 +117,19 @@ namespace MVC_Faculties.Controllers
         [HttpGet]
         public IActionResult AddQuotaByGroup()
         {
-            // First, verify that the user is authenticated
-            if (TempData["UID"] == null || TempData["Username"] == null)
+            // Check authentication
+            if (!HttpContext.Session.IsAuthenticated())
             {
-                // Not authenticated - redirect to authentication with return URL
                 var returnUrl = Url.Action("AddQuotaByGroup", "BalanceAccess");
-                return RedirectToAction("AuthenticateByUsername", "AuthenticationAccess", new { returnUrl = returnUrl });
+                return RedirectToAction("AuthenticateByUsername", "AuthenticationAccess",
+                    new { returnUrl = returnUrl });
             }
 
-            // Second, verify that the user has staff privileges for group operations
-            if (TempData["IsStaff"]?.ToString() != "True")
+            // Check staff privileges using session
+            if (!HttpContext.Session.IsUserStaff())
             {
-                // User is authenticated but lacks required permissions
                 TempData["ErrorMessage"] = "Access denied: Only staff members can manage group quotas.";
-                return RedirectToAction("Index", "PrintsystemAccess");
+                return RedirectToAction("Index", "AuthenticationAccess");
             }
 
             // Create a model for the group quota operation
@@ -135,14 +137,10 @@ namespace MVC_Faculties.Controllers
             {
                 GroupName = "", // User will fill this in
                 QuotaCHF = 0,   // User will specify the amount
-                AuthenticatedUser = TempData["Username"].ToString()
+                AuthenticatedUser = HttpContext.Session.GetUsername()!
             };
 
-            // Preserve authentication data for the POST request
-            TempData.Keep("UID");
-            TempData.Keep("Username");
-            TempData.Keep("IsStaff");
-
+      
             // Display any success messages from previous operations
             ViewBag.SuccessMessage = TempData["SuccessMessage"];
             ViewBag.StaffMessage = "Staff access confirmed - you can manage group quotas.";
@@ -159,6 +157,12 @@ namespace MVC_Faculties.Controllers
         [HttpPost]
         public async Task<IActionResult> AddQuotaByGroup(GroupQuotaM model)
         {
+            // Verify authentication and authorization
+            if (!HttpContext.Session.IsAuthenticated() || !HttpContext.Session.IsUserStaff())
+            {
+                return RedirectToAction("Index", "AuthenticationAccess");
+            }
+
             // Validate the submitted form data
             if (!ModelState.IsValid)
             {

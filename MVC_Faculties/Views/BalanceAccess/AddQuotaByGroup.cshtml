@@ -5,13 +5,56 @@
 }
 
 <div class="row">
-    <div class="col-md-6 mx-auto">
+    <div class="col-md-8 mx-auto">
+
+        @* Session and permission status header *@
+        <div class="alert alert-warning mb-4">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <h5><i class="fas fa-shield-alt"></i> Staff Access - @Model.AuthenticatedUser</h5>
+                    <p class="mb-0">
+                        <span class="badge bg-primary">Staff Permissions Active</span><br>
+                        <small class="text-dark">You are authorized to perform group quota operations affecting multiple users simultaneously.</small>
+                    </p>
+                </div>
+                <div class="btn-group" role="group">
+                    <button type="button" class="btn btn-outline-dark btn-sm" data-bs-toggle="dropdown">
+                        <i class="fas fa-cog"></i> Options
+                    </button>
+                    <ul class="dropdown-menu">
+                        <li>
+                            <a class="dropdown-item" asp-controller="BalanceAccess" asp-action="AddQuotaByUsername">
+                                <i class="fas fa-user"></i> Individual User
+                            </a>
+                        </li>
+                        <li>
+                            <a class="dropdown-item" href="#" data-bs-toggle="modal" data-bs-target="#changeUserModal">
+                                <i class="fas fa-user-friends"></i> Switch User
+                            </a>
+                        </li>
+                        <li>
+                            <a class="dropdown-item" href="#" data-bs-toggle="modal" data-bs-target="#logoutModal">
+                                <i class="fas fa-sign-out-alt"></i> Logout
+                            </a>
+                        </li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li>
+                            <a class="dropdown-item" asp-controller="AuthenticationAccess" asp-action="Index">
+                                <i class="fas fa-home"></i> Return to Home
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        @* Main group quota form *@
         <div class="card">
-            <div class="card-header bg-success text-white">
-                <h4>Add Quota to User Group - Welcome @Model.AuthenticatedUser!</h4>
+            <div class="card-header bg-warning text-dark">
+                <h4><i class="fas fa-users-cog"></i> Add Quota to User Group</h4>
             </div>
             <div class="card-body">
-                @* Display success messages from previous operations *@
+                @* Display status messages *@
                 @if (ViewBag.SuccessMessage != null)
                 {
                     <div class="alert alert-success">
@@ -19,59 +62,122 @@
                     </div>
                 }
 
-                @* Show information about who is performing this operation *@
-                <div class="alert alert-info">
-                    <strong>Authenticated User:</strong> @Model.AuthenticatedUser<br>
-                    <small>You are about to add printing quota to all users in a specific group.</small>
-                </div>
+                @if (ViewBag.StaffMessage != null)
+                {
+                    <div class="alert alert-info">
+                        <i class="fas fa-info-circle"></i> @ViewBag.StaffMessage
+                    </div>
+                }
 
-                @* The main form where users enter group details *@
                 <form asp-action="AddQuotaByGroup" method="post">
-                    @* Display validation errors at the top of the form *@
                     <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
 
-                    @* Hidden field to preserve the authenticated user information *@
                     <input type="hidden" asp-for="AuthenticatedUser" />
 
-                    @* Group name input field *@
                     <div class="form-group mb-3">
-                        <label asp-for="GroupName" class="control-label"></label>
-                        <input asp-for="GroupName" class="form-control" placeholder="e.g., student, staff, faculty" />
+                        <label asp-for="GroupName" class="control-label">Target Group</label>
+                        <select asp-for="GroupName" class="form-control">
+                            <option value="">Select a group...</option>
+                            <option value="student">Students</option>
+                            <option value="staff">Staff</option>
+                            <option value="faculty">Faculty</option>
+                        </select>
                         <span asp-validation-for="GroupName" class="text-danger"></span>
                         <small class="form-text text-muted">
-                            Enter the exact group name. Common groups include: student, staff, faculty
+                            Select the group to receive quota. All users in this group will be affected.
                         </small>
                     </div>
 
-                    @* Quota amount input field *@
                     <div class="form-group mb-3">
-                        <label asp-for="QuotaCHF" class="control-label"></label>
+                        <label asp-for="QuotaCHF" class="control-label">Quota Amount per User (CHF)</label>
                         <div class="input-group">
                             <span class="input-group-text">CHF</span>
                             <input asp-for="QuotaCHF" class="form-control" placeholder="0.00" step="0.01" />
                         </div>
                         <span asp-validation-for="QuotaCHF" class="text-danger"></span>
                         <small class="form-text text-muted">
-                            This amount will be added to EVERY user in the specified group
+                            This amount will be added to EVERY user in the selected group
                         </small>
                     </div>
 
-                    @* Warning message to make users aware of the impact *@
-                    <div class="alert alert-warning">
-                        <strong>⚠️ Important:</strong> This operation will add the specified quota amount to
-                        <em>all users</em> belonging to the group. Please double-check the group name and amount.
+                    @* Quick amount buttons for group operations *@
+                    <div class="mb-3">
+                        <label class="form-label">Common Group Amounts:</label><br>
+                        <div class="btn-group" role="group">
+                            <button type="button" class="btn btn-outline-warning btn-sm quick-amount" data-amount="10.00">10 CHF</button>
+                            <button type="button" class="btn btn-outline-warning btn-sm quick-amount" data-amount="25.00">25 CHF</button>
+                            <button type="button" class="btn btn-outline-warning btn-sm quick-amount" data-amount="50.00">50 CHF</button>
+                            <button type="button" class="btn btn-outline-warning btn-sm quick-amount" data-amount="100.00">100 CHF</button>
+                        </div>
                     </div>
 
-                    @* Form submission buttons *@
+                    <div class="alert alert-danger">
+                        <strong>⚠️ Important:</strong> This operation will add the specified quota amount to
+                        <em>all users</em> belonging to the selected group. Please double-check the group name and amount before proceeding.
+                    </div>
+
                     <div class="form-group text-center mt-4">
-                        <button type="submit" class="btn btn-success">Add Quota to Group</button>
-                        <a asp-action="Index" class="btn btn-secondary">Return to Home</a>
-                        <a asp-action="AuthenticateByUsername" class="btn btn-outline-primary">Individual User Quota</a>
+                        <button type="submit" class="btn btn-warning btn-lg">
+                            <i class="fas fa-users-cog"></i> Add Quota to Group
+                        </button>
+                        <a asp-action="Index" asp-controller="AuthenticationAccess" class="btn btn-secondary">
+                            <i class="fas fa-home"></i> Return to Home
+                        </a>
+                        <a asp-action="AddQuotaByUsername" class="btn btn-outline-primary">
+                            <i class="fas fa-user"></i> Individual User Instead
+                        </a>
                     </div>
                 </form>
             </div>
             <div class="card-footer text-muted text-center">
-                <small>This will add CHF quota to all users in the specified group simultaneously</small>
+                <small>This will add CHF quota to all users in the specified group simultaneously. Your session will remain active for additional operations.</small>
+            </div>
+        </div>
+    </div>
+</div>
+
+@* Session Management Modals *@
+<div class="modal fade" id="changeUserModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Switch User</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <p>This will end the current session and allow you to login as a different user.</p>
+                <p><strong>Current User:</strong> @Model.AuthenticatedUser</p>
+                <p class="text-warning">
+                    <i class="fas fa-exclamation-triangle"></i>
+                    Any unsaved form data will be lost.
+                </p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <a asp-controller="AuthenticationAccess" asp-action="ChangeUser" class="btn btn-warning">
+                    <i class="fas fa-user-friends"></i> Switch User
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="logoutModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Logout</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <p>This will end your current session and return to the main screen.</p>
+                <p><strong>Current User:</strong> @Model.AuthenticatedUser</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <a asp-controller="AuthenticationAccess" asp-action="Logout" class="btn btn-danger">
+                    <i class="fas fa-sign-out-alt"></i> Logout
+                </a>
             </div>
         </div>
     </div>
@@ -81,4 +187,20 @@
     @{
         await Html.RenderPartialAsync("_ValidationScriptsPartial");
     }
+
+    <script>
+        // Quick amount button functionality
+        document.addEventListener('DOMContentLoaded', function() {
+            const quickAmountButtons = document.querySelectorAll('.quick-amount');
+            const amountInput = document.querySelector('input[name="QuotaCHF"]');
+
+            quickAmountButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    const amount = this.getAttribute('data-amount');
+                    amountInput.value = amount;
+                    amountInput.focus();
+                });
+            });
+        });
+    </script>
 }

@@ -6,12 +6,51 @@
 }
 
 <div class="row">
-    <div class="col-md-6 mx-auto">
+    <div class="col-md-8 mx-auto">
+
+        @* Session information header *@
+        <div class="alert alert-success mb-4">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <h5><i class="fas fa-user-check"></i> Authenticated Session</h5>
+                    <p class="mb-0">
+                        <strong>User ID:</strong> @Model.UserID<br>
+                        <small class="text-success">Ready to add credit to your printing account</small>
+                    </p>
+                </div>
+                <div class="btn-group" role="group">
+                    <button type="button" class="btn btn-outline-warning btn-sm" data-bs-toggle="dropdown">
+                        <i class="fas fa-cog"></i> Options
+                    </button>
+                    <ul class="dropdown-menu">
+                        <li>
+                            <a class="dropdown-item" href="#" data-bs-toggle="modal" data-bs-target="#changeCardModal">
+                                <i class="fas fa-exchange-alt"></i> Use Different Card
+                            </a>
+                        </li>
+                        <li>
+                            <a class="dropdown-item" href="#" data-bs-toggle="modal" data-bs-target="#endSessionModal">
+                                <i class="fas fa-sign-out-alt"></i> End Session
+                            </a>
+                        </li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li>
+                            <a class="dropdown-item" asp-controller="AuthenticationAccess" asp-action="Index">
+                                <i class="fas fa-home"></i> Return to Home
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        @* Main credit addition form *@
         <div class="card">
             <div class="card-header bg-success text-white">
-                <h4>Add Printing Credit</h4>
+                <h4><i class="fas fa-plus-circle"></i> Add Printing Credit</h4>
             </div>
             <div class="card-body">
+                @* Display status messages *@
                 @if (ViewBag.SuccessMessage != null)
                 {
                     <div class="alert alert-success">
@@ -19,10 +58,12 @@
                     </div>
                 }
 
-                <div class="alert alert-info">
-                    <strong>Card authenticated successfully!</strong><br>
-                    <small>You can now add credit to your printing account.</small>
-                </div>
+                @if (ViewBag.InfoMessage != null)
+                {
+                    <div class="alert alert-info">
+                        <i class="fas fa-info-circle"></i> @ViewBag.InfoMessage
+                    </div>
+                }
 
                 <form asp-controller="BalanceAccess" asp-action="AddQuotaByUID" method="post">
                     <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
@@ -39,19 +80,85 @@
                         <small class="form-text text-muted">Enter the amount in Swiss Francs to add to your printing account</small>
                     </div>
 
+                    @* Quick amount buttons for common values *@
+                    <div class="mb-3">
+                        <label class="form-label">Quick Amounts:</label><br>
+                        <div class="btn-group" role="group">
+                            <button type="button" class="btn btn-outline-primary btn-sm quick-amount" data-amount="5.00">5 CHF</button>
+                            <button type="button" class="btn btn-outline-primary btn-sm quick-amount" data-amount="10.00">10 CHF</button>
+                            <button type="button" class="btn btn-outline-primary btn-sm quick-amount" data-amount="20.00">20 CHF</button>
+                            <button type="button" class="btn btn-outline-primary btn-sm quick-amount" data-amount="50.00">50 CHF</button>
+                        </div>
+                    </div>
+
                     <div class="alert alert-warning">
                         <strong>Current Rate:</strong> A4 Black & White printing costs 0.08 CHF per page
                     </div>
 
                     <div class="form-group text-center mt-4">
-                        <button type="submit" class="btn btn-success">Add Credit</button>
-                        <a asp-controller="AuthenticationAccess" asp-action="AuthenticateByCard" class="btn btn-secondary">Use Different Card</a>
-                        <a asp-controller="AuthenticationAccess" asp-action="Index" class="btn btn-outline-primary">Cancel</a>
+                        <button type="submit" class="btn btn-success btn-lg">
+                            <i class="fas fa-plus-circle"></i> Add Credit
+                        </button>
+                        <a asp-controller="AuthenticationAccess" asp-action="Index" class="btn btn-secondary">
+                            <i class="fas fa-home"></i> Home
+                        </a>
                     </div>
                 </form>
             </div>
             <div class="card-footer text-muted text-center">
-                <small>This will add CHF credit that can be used for printing services</small>
+                <small>This will add CHF credit that can be used for printing services. Your session will remain active for additional transactions.</small>
+            </div>
+        </div>
+    </div>
+</div>
+
+@* Change Card Modal *@
+<div class="modal fade" id="changeCardModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Use Different Card</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <p>This will clear the current authentication and allow you to scan a different card.</p>
+                <p><strong>Current User:</strong> @Model.UserID</p>
+                <p class="text-warning">
+                    <i class="fas fa-exclamation-triangle"></i>
+                    Any unsaved form data will be lost.
+                </p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <form asp-controller="AuthenticationAccess" asp-action="ScanDifferentCard" method="post" style="display: inline;">
+                    <button type="submit" class="btn btn-warning">
+                        <i class="fas fa-exchange-alt"></i> Scan Different Card
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@* End Session Modal *@
+<div class="modal fade" id="endSessionModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">End Session</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <p>This will end your current session and return to the main screen.</p>
+                <p><strong>Current User:</strong> @Model.UserID</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <form asp-controller="BalanceAccess" asp-action="CompleteSession" method="post" style="display: inline;">
+                    <button type="submit" class="btn btn-danger">
+                        <i class="fas fa-sign-out-alt"></i> End Session
+                    </button>
+                </form>
             </div>
         </div>
     </div>
@@ -61,4 +168,20 @@
     @{
         await Html.RenderPartialAsync("_ValidationScriptsPartial");
     }
+
+    <script>
+        // Quick amount button functionality
+        document.addEventListener('DOMContentLoaded', function() {
+            const quickAmountButtons = document.querySelectorAll('.quick-amount');
+            const amountInput = document.querySelector('input[name="QuotaCHF"]');
+
+            quickAmountButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    const amount = this.getAttribute('data-amount');
+                    amountInput.value = amount;
+                    amountInput.focus();
+                });
+            });
+        });
+    </script>
 }

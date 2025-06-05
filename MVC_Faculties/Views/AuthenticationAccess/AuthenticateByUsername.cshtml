@@ -6,11 +6,41 @@
 
 <div class="row">
     <div class="col-md-6 mx-auto">
+
+        @* Show current session status if user is switching *@
+        @if (Context.Session.Keys.Contains("UserId"))
+        {
+            <div class="alert alert-warning mb-4">
+                <div class="d-flex justify-content-between align-items-start">
+                    <div>
+                        <h5><i class="fas fa-user-friends"></i> Switching Users</h5>
+                        <p class="mb-0">
+                            <strong>Currently logged in:</strong> @Context.Session.GetString("Username")<br>
+                            <small>Login below to switch to a different user account, or return to the dashboard.</small>
+                        </p>
+                    </div>
+                    <a asp-controller="AuthenticationAccess" asp-action="Index" class="btn btn-outline-primary btn-sm">
+                        <i class="fas fa-arrow-left"></i> Back to Dashboard
+                    </a>
+                </div>
+            </div>
+        }
+
         <div class="card">
             <div class="card-header bg-primary text-white">
-                <h4>Login to Printing System</h4>
+                <h4>
+                    @if (Context.Session.Keys.Contains("UserId"))
+                    {
+                        <i class="fas fa-user-friends"></i> <span>Switch User</span>
+                    }
+                    else
+                    {
+                        <i class="fas fa-sign-in-alt"></i> <span>Login to Printing System</span>
+                    }
+                </h4>
             </div>
             <div class="card-body">
+                @* Display status messages *@
                 @if (ViewBag.ErrorMessage != null)
                 {
                     <div class="alert alert-danger">
@@ -18,6 +48,12 @@
                     </div>
                 }
 
+                @if (TempData["InfoMessage"] != null)
+                {
+                    <div class="alert alert-info">
+                        <i class="fas fa-info-circle"></i> @TempData["InfoMessage"]
+                    </div>
+                }
 
                 @if (!string.IsNullOrEmpty(ViewBag.ReturnUrl))
                 {
@@ -42,7 +78,6 @@
                 <form asp-action="AuthenticateByUsername" method="post">
                     <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
 
-
                     @if (!string.IsNullOrEmpty(ViewBag.ReturnUrl))
                     {
                         <input type="hidden" name="returnUrl" value="@ViewBag.ReturnUrl" />
@@ -61,13 +96,42 @@
                     </div>
 
                     <div class="form-group text-center mt-4">
-                        <button type="submit" class="btn btn-success">Login</button>
-                        <a asp-action="Index" class="btn btn-secondary">Cancel</a>
+                        <button type="submit" class="btn btn-primary btn-lg">
+                            <i class="fas fa-sign-in-alt"></i>
+                            @if (Context.Session.Keys.Contains("UserId"))
+                            {
+                                <span>Switch to This User</span>
+                            }
+                            else
+                            {
+                                <span>Login</span>
+                            }
+                        </button>
+
+                        @if (Context.Session.Keys.Contains("UserId"))
+                        {
+                            <a asp-action="Index" class="btn btn-success">
+                                <i class="fas fa-arrow-left"></i> Keep Current User
+                            </a>
+                        }
+
+                        <a asp-action="Index" class="btn btn-secondary">
+                            <i class="fas fa-home"></i> Home
+                        </a>
                     </div>
                 </form>
             </div>
             <div class="card-footer text-muted text-center">
-                <small>Please enter your credentials to access the printing system</small>
+                <small>
+                    @if (Context.Session.Keys.Contains("UserId"))
+                    {
+                        <span>Logging in will switch your session to the new user account</span>
+                    }
+                    else
+                    {
+                        <span>Please enter your credentials to access the printing system</span>
+                    }
+                </small>
             </div>
         </div>
     </div>

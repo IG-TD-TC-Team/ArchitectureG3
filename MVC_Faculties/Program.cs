@@ -11,12 +11,28 @@ public class Program
 
         // Add services to the container.
         builder.Services.AddControllersWithViews();
-        
-        //builder.Services.AddHttpClient<IPrintsystemServices, PrintsystemServices>();
 
         builder.Services.AddHttpClient<IAuthenticationService, AuthenticationService>();
 
         builder.Services.AddHttpClient<IBalanceService, BalanceService>();
+
+        builder.Services.AddSession(options =>
+        {
+            // Session will expire after 30 minutes of inactivity
+            options.IdleTimeout = TimeSpan.FromMinutes(30);
+
+            // Security: Prevent JavaScript access to session cookies
+           options.Cookie.HttpOnly = true;
+
+            // Mark session cookies as essential for GDPR compliance
+            options.Cookie.IsEssential = true;
+
+            // Use secure cookies in production (HTTPS only)
+            options.Cookie.SecurePolicy = CookieSecurePolicy.SameAsRequest;
+
+            // Set a descriptive name for your session cookie
+            options.Cookie.Name = "FacultiesSession";
+        });
 
         var app = builder.Build();
 
@@ -32,6 +48,8 @@ public class Program
         app.UseStaticFiles();
 
         app.UseRouting();
+
+        app.UseSession();
 
         app.UseAuthorization();
 
