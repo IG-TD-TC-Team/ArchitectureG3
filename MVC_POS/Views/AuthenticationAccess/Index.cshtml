@@ -3,57 +3,213 @@
     Layout = "_Layout";
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome to the Printing System POS</h1>
-    <p>Please authenticate with your card to begin adding credit to your account.</p>
-
-    <div class="mt-4">
-        <a asp-controller="AuthenticationAccess" asp-action="AuthenticateByCard" class="btn btn-primary btn-lg">
-            <i class="fas fa-credit-card"></i> Scan Card
-        </a>
-    </div>
-</div>
-
-<div class="row mt-5">
-    <div class="col-md-6">
-        <div class="card">
-            <div class="card-header">
-                <h5><i class="fas fa-cash-register"></i> Point of Sale</h5>
-            </div>
-            <div class="card-body">
-                <p>Add funds to your printing account using your card.</p>
-                <ul>
-                    <li>Scan your card to authenticate</li>
-                    <li>Enter the amount to add to your account</li>
-                    <li>Confirm the transaction</li>
-                    <li>Get a summary of your updated balance</li>
-                </ul>
-                <div class="mt-3">
-                    <a asp-controller="AuthenticationAccess" asp-action="AuthenticateByCard" class="btn btn-outline-primary">
-                        Get Started
-                    </a>
+@* 
+    NEW SECTION: Session Status Display
+    This shows users whether they're currently authenticated and provides context-appropriate options
+*@
+@if (Context.Session.Keys.Contains("UserId"))
+{
+    @* User is authenticated - show session info and options *@
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="alert alert-success">
+                <div class="d-flex justify-content-between align-items-start">
+                    <div>
+                        <h5><i class="fas fa-check-circle"></i> Card Authenticated</h5>
+                        <p class="mb-0">
+                            <strong>User ID:</strong> @Context.Session.GetString("UserId")<br>
+                            <small class="text-muted">Your card session is active and ready for transactions.</small>
+                        </p>
+                    </div>
+                    <div class="btn-group" role="group">
+                        @* Quick action buttons for authenticated users *@
+                        <a asp-controller="BalanceAccess" asp-action="AddQuotaByUID" class="btn btn-primary btn-sm">
+                            <i class="fas fa-plus"></i> Add Credit
+                        </a>
+                        <a asp-controller="AuthenticationAccess" asp-action="AuthenticateByCard" class="btn btn-outline-secondary btn-sm">
+                            <i class="fas fa-credit-card"></i> Different Card
+                        </a>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
-    <div class="col-md-6">
-        <div class="card">
-            <div class="card-header">
-                <h5><i class="fas fa-info-circle"></i> System Information</h5>
-            </div>
-            <div class="card-body">
-                <p>The current rate for printing is:</p>
-                <ul>
-                    <li><strong>A4 Black & White:</strong> 0.08 CHF per page</li>
-                    <li><strong>Minimum credit:</strong> 0.01 CHF</li>
-                    <li><strong>Maximum credit:</strong> 1000.00 CHF</li>
-                </ul>
-                <p>For any issues with the system, please contact the administrator.</p>
 
-                <div class="alert alert-info mt-3">
-                    <small><strong>Note:</strong> Credit expires after 4 years from the date of addition.</small>
+    @* Authenticated user dashboard *@
+    <div class="text-center">
+        <h1 class="display-4">Welcome Back!</h1>
+        <p class="lead">Your card is authenticated and ready for transactions.</p>
+
+        <div class="row mt-4">
+            <div class="col-md-6 mx-auto">
+                <div class="card border-success">
+                    <div class="card-header bg-success text-white">
+                        <h5><i class="fas fa-wallet"></i> Quick Actions</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="d-grid gap-3">
+                            <a asp-controller="BalanceAccess" asp-action="AddQuotaByUID" class="btn btn-success btn-lg">
+                                <i class="fas fa-plus-circle"></i> Add Credit to Account
+                            </a>
+
+                            <a asp-controller="BalanceAccess" asp-action="AddMoreCredit" class="btn btn-outline-success">
+                                <i class="fas fa-redo"></i> Add More Credit
+                            </a>
+
+                            <hr>
+
+                            <button type="button" class="btn btn-outline-warning" data-bs-toggle="modal" data-bs-target="#changeCardModal">
+                                <i class="fas fa-exchange-alt"></i> Use Different Card
+                            </button>
+
+                            <button type="button" class="btn btn-outline-danger" data-bs-toggle="modal" data-bs-target="#logoutModal">
+                                <i class="fas fa-sign-out-alt"></i> End Session
+                            </button>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
-</div>
+}
+else
+{
+    @* User is not authenticated - show welcome and scan card option *@
+    <div class="text-center">
+        <h1 class="display-4">Welcome to the Printing System POS</h1>
+        <p class="lead">Please scan your card to begin adding credit to your printing account.</p>
+
+        @* Show any status messages *@
+        @if (TempData["SuccessMessage"] != null)
+        {
+            <div class="alert alert-success">
+                <i class="fas fa-check-circle"></i> @TempData["SuccessMessage"]
+            </div>
+        }
+
+        @if (TempData["ErrorMessage"] != null)
+        {
+            <div class="alert alert-danger">
+                <i class="fas fa-exclamation-triangle"></i> @TempData["ErrorMessage"]
+            </div>
+        }
+
+        @if (TempData["InfoMessage"] != null)
+        {
+            <div class="alert alert-info">
+                <i class="fas fa-info-circle"></i> @TempData["InfoMessage"]
+            </div>
+        }
+
+        <div class="mt-4">
+            <a asp-controller="AuthenticationAccess" asp-action="AuthenticateByCard" class="btn btn-primary btn-lg">
+                <i class="fas fa-credit-card"></i> Scan Card
+            </a>
+        </div>
+    </div>
+
+    @* Information cards for unauthenticated users *@
+    <div class="row mt-5">
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header">
+                    <h5><i class="fas fa-cash-register"></i> Point of Sale</h5>
+                </div>
+                <div class="card-body">
+                    <p>Add funds to your printing account using your card.</p>
+                    <ul>
+                        <li>Scan your card to authenticate</li>
+                        <li>Enter the amount to add to your account</li>
+                        <li>Confirm the transaction</li>
+                        <li>Get a summary of your updated balance</li>
+                    </ul>
+                    <div class="mt-3">
+                        <a asp-controller="AuthenticationAccess" asp-action="AuthenticateByCard" class="btn btn-outline-primary">
+                            Get Started
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header">
+                    <h5><i class="fas fa-info-circle"></i> System Information</h5>
+                </div>
+                <div class="card-body">
+                    <p>The current rate for printing is:</p>
+                    <ul>
+                        <li><strong>A4 Black & White:</strong> 0.08 CHF per page</li>
+                        <li><strong>Minimum credit:</strong> 0.01 CHF</li>
+                        <li><strong>Maximum credit:</strong> 1000.00 CHF</li>
+                    </ul>
+                    <p>For any issues with the system, please contact the administrator.</p>
+
+                    <div class="alert alert-info mt-3">
+                        <small><strong>Note:</strong> Credit expires after 4 years from the date of addition.</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+@* Modal for changing cards - only show if user is authenticated *@
+@if (Context.Session.Keys.Contains("UserId"))
+{
+    <!-- Change Card Modal -->
+    <div class="modal fade" id="changeCardModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Use Different Card</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <p>This will clear the current card authentication and allow you to scan a different card.</p>
+                    <p><strong>Current User ID:</strong> @Context.Session.GetString("UserId")</p>
+                    <p class="text-warning">
+                        <i class="fas fa-exclamation-triangle"></i>
+                        Any unsaved transaction data will be lost.
+                    </p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <form asp-controller="AuthenticationAccess" asp-action="ScanDifferentCard" method="post" style="display: inline;">
+                        <button type="submit" class="btn btn-warning">
+                            <i class="fas fa-exchange-alt"></i> Scan Different Card
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Logout Modal -->
+    <div class="modal fade" id="logoutModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">End Session</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <p>This will end your current session and clear all authentication data.</p>
+                    <p><strong>Current User ID:</strong> @Context.Session.GetString("UserId")</p>
+                    <p class="text-info">
+                        <i class="fas fa-info-circle"></i>
+                        You can always scan your card again to start a new session.
+                    </p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <form asp-controller="BalanceAccess" asp-action="CompleteSession" method="post" style="display: inline;">
+                        <button type="submit" class="btn btn-danger">
+                            <i class="fas fa-sign-out-alt"></i> End Session
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+}

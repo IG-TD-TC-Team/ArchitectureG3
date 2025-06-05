@@ -13,6 +13,18 @@ namespace MVC_POS
             builder.Services.AddHttpClient<IAuthenticationService, AuthenticationService>();
             builder.Services.AddHttpClient<IBalanceService, BalanceService>();
 
+            builder.Services.AddSession(options =>
+            {
+             
+                // POS operations are typically quick, so shorter sessions improve security
+                options.IdleTimeout = TimeSpan.FromMinutes(15);
+
+                options.Cookie.HttpOnly = true;
+                options.Cookie.IsEssential = true;
+                options.Cookie.SecurePolicy = CookieSecurePolicy.SameAsRequest;
+                options.Cookie.Name = "POSSession";
+            });
+
             var app = builder.Build();
 
             // Configure the HTTP request pipeline.
@@ -27,6 +39,8 @@ namespace MVC_POS
             app.UseStaticFiles();
 
             app.UseRouting();
+
+            app.UseSession();
 
             app.UseAuthorization();
 

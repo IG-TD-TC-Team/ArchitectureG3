@@ -6,7 +6,7 @@
 }
 
 <div class="row">
-    <div class="col-md-8 mx-auto">
+    <div class="col-md-10 mx-auto">
         <div class="card">
             <div class="card-header bg-success text-white">
                 <h4><i class="fas fa-check-circle"></i> Transaction Complete</h4>
@@ -21,6 +21,7 @@
                 <div class="card bg-light">
                     <div class="card-body">
                         <dl class="row mb-0">
+                           
                             <dt class="col-sm-4">Amount Added:</dt>
                             <dd class="col-sm-8">
                                 <strong class="text-success">@Model.AmountCredited.ToString("C")</strong>
@@ -51,31 +52,68 @@
                     </ul>
                 </div>
 
-                <div class="card border-secondary mt-4">
-                    <div class="card-header bg-secondary text-white">
-                        <h6 class="mb-0">What would you like to do next?</h6>
-                    </div>
-                    <div class="card-body">
-                        <div class="row">
-                            <div class="col-md-6">
-                                <h6>For This Session</h6>
-                                <div class="d-grid gap-2">
-                                    <a asp-controller="AuthenticationAccess" asp-action="AuthenticateByCard" class="btn btn-primary btn-sm">
-                                        Process Another Card
-                                    </a>
+                @* Session-aware next steps *@
+                @if (ViewBag.CanContinue == true)
+                {
+                    <div class="card border-primary mt-4">
+                        <div class="card-header bg-primary text-white">
+                            <h6 class="mb-0"><i class="fas fa-forward"></i> What would you like to do next?</h6>
+                        </div>
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <h6>Continue with Same Card</h6>
+                                    <p class="small text-muted">Your session is still active for User ID: @ViewBag.CurrentUserId</p>
+                                    <div class="d-grid gap-2">
+                                        <a asp-controller="BalanceAccess" asp-action="AddMoreCredit" class="btn btn-success">
+                                            <i class="fas fa-plus"></i> Add More Credit
+                                        </a>
+                                        <form asp-controller="BalanceAccess" asp-action="CompleteSession" method="post" style="display: inline;">
+                                            <button type="submit" class="btn btn-outline-success w-100">
+                                                <i class="fas fa-check"></i> Finish & Logout
+                                            </button>
+                                        </form>
+                                    </div>
                                 </div>
-                            </div>
-                            <div class="col-md-6">
-                                <h6>Navigation</h6>
-                                <div class="d-grid gap-2">
-                                    <a asp-controller="AuthenticationAccess" asp-action="Index" class="btn btn-success btn-sm">
-                                        Return to Main Menu
-                                    </a>
+                                <div class="col-md-6">
+                                    <h6>Switch Cards</h6>
+                                    <p class="small text-muted">Use the POS system for a different card</p>
+                                    <div class="d-grid gap-2">
+                                        <form asp-controller="AuthenticationAccess" asp-action="ScanDifferentCard" method="post" style="display: inline;">
+                                            <button type="submit" class="btn btn-warning w-100">
+                                                <i class="fas fa-exchange-alt"></i> Scan Different Card
+                                            </button>
+                                        </form>
+                                        <a asp-controller="AuthenticationAccess" asp-action="Index" class="btn btn-outline-primary">
+                                            <i class="fas fa-home"></i> Return to Home
+                                        </a>
+                                    </div>
                                 </div>
                             </div>
                         </div>
                     </div>
-                </div>
+                }
+                else
+                {
+                    @* Session expired or lost *@
+                    <div class="card border-warning mt-4">
+                        <div class="card-header bg-warning text-dark">
+                            <h6 class="mb-0"><i class="fas fa-exclamation-triangle"></i> Session Information</h6>
+                        </div>
+                        <div class="card-body">
+                            <p>Your session has ended. To perform another transaction, please scan your card again.</p>
+                            <div class="d-grid gap-2">
+                                <a asp-controller="AuthenticationAccess" asp-action="AuthenticateByCard" class="btn btn-primary">
+                                    <i class="fas fa-credit-card"></i> Scan Card for New Transaction
+                                </a>
+                                <a asp-controller="AuthenticationAccess" asp-action="Index" class="btn btn-outline-secondary">
+                                    <i class="fas fa-home"></i> Return to Home
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                }
+
             </div>
         </div>
     </div>

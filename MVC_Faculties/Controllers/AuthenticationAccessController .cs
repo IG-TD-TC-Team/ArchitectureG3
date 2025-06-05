@@ -1,6 +1,7 @@
 ﻿using MVC_Faculties.Models;
 using Microsoft.AspNetCore.Mvc;
 using MVC_Faculties.Services;
+using MVC_Faculties.Extensions;
 
 namespace MVC_Faculties.Controllers
 {
@@ -25,6 +26,14 @@ namespace MVC_Faculties.Controllers
         [HttpGet]
         public IActionResult Index()
         {
+            // Check if the user is already authenticated
+            if (HttpContext.Session.IsAuthenticated())
+            {
+                ViewBag.Username = HttpContext.Session.GetUsername();
+                ViewBag.IsStaff = HttpContext.Session.IsUserStaff();
+                ViewBag.Group = HttpContext.Session.GetUserGroup();
+            }
+
             return View();
         }
 
@@ -36,6 +45,15 @@ namespace MVC_Faculties.Controllers
         [HttpGet]
         public IActionResult AuthenticateByUsername(string returnUrl = null)
         {
+            // Check if the user is already authenticated
+            if (HttpContext.Session.IsAuthenticated())
+            {
+                if (!string.IsNullOrEmpty(returnUrl))
+                {
+                    return LocalRedirect(returnUrl);
+                }
+                return RedirectToAction("AddQuotaByUsername", "BalanceAccess");
+            }
             // Store the return URL so we know where to redirect after successful authentication
             ViewBag.ReturnUrl = returnUrl;
 
@@ -67,13 +85,17 @@ namespace MVC_Faculties.Controllers
 
                 if (authResponse.IsSuccessful)
                 {
-                    // Authentication succeeded - store user information in TempData for use across requests
-                    // TempData persists data for exactly one additional request
-                    TempData["UID"] = authResponse.UID.ToString();
-                    TempData["Username"] = userAuth.Username;
-                    TempData["IsStaff"] = authResponse.IsStaff.ToString();
-                    TempData["Group"] = authResponse.Group;
+                    // Authentication succeeded - store user information in session
+                    HttpContext.Session.SetUserAuthentication(
+                        authResponse.UID,
+                        userAuth.Username,
+                        authResponse.IsStaff,
+                        authResponse.Group
+                        );
+
+                    
                     TempData["SuccessMessage"] = authResponse.Message;
+
 
                     // Determine where to redirect the user based on their requested destination and permissions
                     if (!string.IsNullOrWhiteSpace(returnUrl))
@@ -142,11 +164,10 @@ namespace MVC_Faculties.Controllers
         public IActionResult ChangeUser()
         {
             // Clear current authentication data but keep a helpful message
-            TempData.Clear();
+            HttpContext.Session.ClearAuthentication();
             TempData["InfoMessage"] = "Please authenticate as a different user.";
-
-            // Redirect back to the authentication form
             return RedirectToAction("AuthenticateByUsername");
+
         }
 
         /// <summary>
@@ -157,10 +178,9 @@ namespace MVC_Faculties.Controllers
         public IActionResult Logout()
         {
             // Clear all authentication and session data
+            HttpContext.Session.ClearAuthentication();
             TempData.Clear();
-
-            // Redirect to the main system entry point
-            return RedirectToAction("Index", "AuthenticationAccess");
+            return RedirectToAction("Index");
         }
     }
 }

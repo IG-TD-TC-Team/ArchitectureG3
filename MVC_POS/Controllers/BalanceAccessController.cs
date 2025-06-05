@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using MVC_POS.Extensions;
 using MVC_POS.Models;
 using MVC_POS.Services;
 
@@ -17,21 +18,34 @@ namespace MVC_POS.Controllers
         [HttpGet]
         public IActionResult AddQuotaByUID()
         {
-            // Check if we have authenticated user
-            if (TempData["UserID"] == null)
+            // Check if user is authenticated via session (not TempData)
+            if (!HttpContext.Session.IsAuthenticated())
             {
-                // Redirect to AuthenticationAccessController's Card action
+                TempData["ErrorMessage"] = "Please scan your card first to authenticate.";
+                return RedirectToAction("AuthenticateByCard", "AuthenticationAccess");
+            }
+
+            // Retrieve the user ID from session with null checking
+            var userId = HttpContext.Session.GetUserId();
+
+            // Double-check that we have valid session data
+            if (!userId.HasValue || userId.Value == Guid.Empty)
+            {
+                // Session data is corrupted, force re-authentication
+                HttpContext.Session.ClearAuthentication();
+                TempData["ErrorMessage"] = "Authentication session expired. Please scan your card again.";
                 return RedirectToAction("AuthenticateByCard", "AuthenticationAccess");
             }
 
             var model = new BalanceM
             {
-                UserID = Guid.Parse(TempData["UserID"].ToString())
+                UserID = userId.Value
             };
 
-            // Keep the data for the POST request
-            TempData.Keep("UserID");
+            // Display any success messages from the authentication step
             ViewBag.SuccessMessage = TempData["SuccessMessage"];
+            ViewBag.InfoMessage = TempData["InfoMessage"];
+
 
             return View(model);
         }
@@ -39,9 +53,27 @@ namespace MVC_POS.Controllers
         [HttpPost]
         public async Task<IActionResult> AddQuotaByUID(BalanceM model)
         {
+
+            // Re-verify authentication for POST operations
+            if (!HttpContext.Session.IsAuthenticated())
+            {
+                TempData["ErrorMessage"] = "Authentication session expired. Please scan your card again.";
+                return RedirectToAction("AuthenticateByCard", "AuthenticationAccess");
+            }
+
+            //Validate the submitted form data
             if (!ModelState.IsValid)
             {
                 return View(model);
+            }
+
+            // Additional verification that the UserID in the form matches the session
+            var sessionUserId = HttpContext.Session.GetUserId();
+            if (!sessionUserId.HasValue || sessionUserId.Value != model.UserID)
+            {
+                ModelState.AddModelError("", "Session data mismatch. Please scan your card again.");
+                HttpContext.Session.ClearAuthentication();
+                return RedirectToAction("AuthenticateByCard", "AuthenticationAccess");
             }
 
             try
@@ -76,6 +108,7 @@ namespace MVC_POS.Controllers
         {
             if (TempData["TransactionSuccess"] == null)
             {
+                TempData["ErrorMessage"] = "No transaction data found. Please start a new transaction.";
                 // Redirect to AuthenticationAccessController's Index action
                 return RedirectToAction("Index", "AuthenticationAccess");
             }
@@ -85,11 +118,47 @@ namespace MVC_POS.Controllers
                 AmountCredited = decimal.Parse(TempData["AmountAdded"]?.ToString() ?? "0"),
                 NewQuotaCHF = decimal.Parse(TempData["NewQuotaCHF"]?.ToString() ?? "0"),
                 NewPrintQuota = int.Parse(TempData["NewPrintQuota"]?.ToString() ?? "0"),
+                UserId = Guid.Parse(TempData["TransactionUserID"]?.ToString() ?? Guid.Empty.ToString()),
                 IsSuccessful = true,
                 Message = "Transaction completed successfully"
             };
 
+            // Provide user options for what to do next
+            // Since session is still active, they can perform another transaction
+            ViewBag.CanContinue = HttpContext.Session.IsAuthenticated();
+            ViewBag.CurrentUserId = HttpContext.Session.GetUserId();
+
             return View(model);
         }
+
+        /// <summary>
+        /// Allows users to add more credit to the same card
+        /// Takes advantage of the persistent session authentication
+        /// </summary>
+        [HttpGet]
+        public IActionResult AddMoreCredit()
+        {
+            if (!HttpContext.Session.IsAuthenticated())
+            {
+                TempData["ErrorMessage"] = "Please scan your card first.";
+                return RedirectToAction("AuthenticateByCard", "AuthenticationAccess");
+            }
+
+            TempData["InfoMessage"] = "Ready to add more credit to the same card.";
+            return RedirectToAction("AddQuotaByUID");
+        }
+
+        /// <summary>
+        /// Completes the session and clears authentication
+        /// Useful when the transaction is completely finished
+        /// </summary>
+        [HttpPost]
+        public IActionResult CompleteSession()
+        {
+            HttpContext.Session.ClearAuthentication();
+            TempData["SuccessMessage"] = "Session completed successfully. Thank you for using the printing system!";
+            return RedirectToAction("Index", "AuthenticationAccess");
+        }
+
     }
 }

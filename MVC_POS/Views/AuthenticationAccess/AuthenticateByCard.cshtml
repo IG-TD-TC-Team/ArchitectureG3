@@ -4,17 +4,74 @@
 }
 
 <div class="row">
-    <div class="col-md-6 mx-auto">
+    <div class="col-md-8 mx-auto">
+
+        @* Session status header - shows different content based on authentication state *@
+        @if (Context.Session.Keys.Contains("UserId"))
+        {
+            @* User is switching cards *@
+            <div class="alert alert-warning mb-4">
+                <div class="d-flex justify-content-between align-items-start">
+                    <div>
+                        <h5><i class="fas fa-exchange-alt"></i> Switching Cards</h5>
+                        <p class="mb-0">
+                            <strong>Currently authenticated:</strong> User ID @Context.Session.GetString("UserId")<br>
+                            <small>Scan a new card below to switch to a different account, or continue with the current card.</small>
+                        </p>
+                    </div>
+                    <a asp-controller="BalanceAccess" asp-action="AddQuotaByUID" class="btn btn-outline-primary btn-sm">
+                        <i class="fas fa-arrow-right"></i> Continue with Current Card
+                    </a>
+                </div>
+            </div>
+        }
+        else
+        {
+            @* Fresh authentication *@
+            <div class="alert alert-info mb-4">
+                <h5><i class="fas fa-credit-card"></i> Card Authentication Required</h5>
+                <p class="mb-0">Please scan your card to access the printing system and add credit to your account.</p>
+            </div>
+        }
+
+        @* Main authentication card *@
         <div class="card">
             <div class="card-header bg-primary text-white">
-                <h4>Scan Your Card</h4>
+                <h4>
+                    @if (Context.Session.Keys.Contains("UserId"))
+                    {
+                        <i class="fas fa-exchange-alt"></i>
+                        <span>Scan New Card</span>
+                    }
+                    else
+                    {
+                        <i class="fas fa-credit-card"></i>
+                        <span>Scan Your Card</span>
+                    }
+                </h4>
             </div>
             <div class="card-body">
-                <div class="alert alert-info">
-                    <i class="fas fa-credit-card"></i>
-                    <strong>Card Authentication Required</strong><br>
-                    <small>Please enter your card ID to access the printing system.</small>
-                </div>
+                @* Display any status messages *@
+                @if (TempData["ErrorMessage"] != null)
+                {
+                    <div class="alert alert-danger">
+                        <i class="fas fa-exclamation-triangle"></i> @TempData["ErrorMessage"]
+                    </div>
+                }
+
+                @if (TempData["InfoMessage"] != null)
+                {
+                    <div class="alert alert-info">
+                        <i class="fas fa-info-circle"></i> @TempData["InfoMessage"]
+                    </div>
+                }
+
+                @if (ViewBag.CurrentUserMessage != null)
+                {
+                    <div class="alert alert-warning">
+                        <i class="fas fa-user"></i> @ViewBag.CurrentUserMessage
+                    </div>
+                }
 
                 <form asp-controller="AuthenticationAccess" asp-action="AuthenticateByCard" method="post">
                     <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
@@ -27,14 +84,41 @@
 
                     <div class="form-group text-center mt-4">
                         <button type="submit" class="btn btn-primary btn-lg">
-                            <i class="fas fa-check"></i> Authenticate
+                            <i class="fas fa-check"></i>
+                            @if (Context.Session.Keys.Contains("UserId"))
+                            {
+                                @:Switch to This Card
+                            }
+                            else
+                            {
+                                @:Authenticate
+                            }
                         </button>
-                        <a asp-action="Index" class="btn btn-secondary">Cancel</a>
+
+                        @if (Context.Session.Keys.Contains("UserId"))
+                        {
+                            <a asp-controller="BalanceAccess" asp-action="AddQuotaByUID" class="btn btn-success">
+                                <i class="fas fa-arrow-right"></i> Continue with Current Card
+                            </a>
+                        }
+
+                        <a asp-action="Index" class="btn btn-secondary">
+                            <i class="fas fa-home"></i> Home
+                        </a>
                     </div>
                 </form>
             </div>
             <div class="card-footer text-muted text-center">
-                <small>Your card will be validated against the printing system database</small>
+                <small>
+                    @if (Context.Session.Keys.Contains("UserId"))
+                    {
+                        @:Scanning a new card will switch your session to that card's account
+                    }
+                    else
+                    {
+                        @:Your card will be validated against the printing system database
+                    }
+                </small>
             </div>
         </div>
     </div>

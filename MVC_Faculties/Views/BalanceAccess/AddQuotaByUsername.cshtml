@@ -5,12 +5,64 @@
 }
 
 <div class="row">
-    <div class="col-md-6 mx-auto">
+    <div class="col-md-8 mx-auto">
+
+        @* Session information header *@
+        <div class="alert alert-success mb-4">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <h5><i class="fas fa-user-check"></i> Authenticated as @Model.Username</h5>
+                    <p class="mb-0">
+                        <strong>Group:</strong> @Model.Group
+                        @if (Context.Session.GetString("IsStaff") == "True")
+                        {
+                            <span class="badge bg-primary ms-2">Staff Access</span>
+                        }
+                        <br>
+                        <small class="text-success">Ready to add quota to your printing account</small>
+                    </p>
+                </div>
+                <div class="btn-group" role="group">
+                    <button type="button" class="btn btn-outline-warning btn-sm" data-bs-toggle="dropdown">
+                        <i class="fas fa-cog"></i> Options
+                    </button>
+                    <ul class="dropdown-menu">
+                        <li>
+                            <a class="dropdown-item" href="#" data-bs-toggle="modal" data-bs-target="#changeUserModal">
+                                <i class="fas fa-user-friends"></i> Switch User
+                            </a>
+                        </li>
+                        @if (Context.Session.GetString("IsStaff") == "True")
+                        {
+                            <li>
+                                <a class="dropdown-item" asp-controller="BalanceAccess" asp-action="AddQuotaByGroup">
+                                    <i class="fas fa-users"></i> Group Management
+                                </a>
+                            </li>
+                        }
+                        <li>
+                            <a class="dropdown-item" href="#" data-bs-toggle="modal" data-bs-target="#logoutModal">
+                                <i class="fas fa-sign-out-alt"></i> Logout
+                            </a>
+                        </li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li>
+                            <a class="dropdown-item" asp-controller="AuthenticationAccess" asp-action="Index">
+                                <i class="fas fa-home"></i> Return to Home
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        @* Main quota addition form *@
         <div class="card">
             <div class="card-header bg-success text-white">
-                <h4>Add Quota - Welcome @Model.Username!</h4>
+                <h4><i class="fas fa-plus-circle"></i> Add Quota - @Model.Username</h4>
             </div>
             <div class="card-body">
+                @* Display status messages *@
                 @if (ViewBag.SuccessMessage != null)
                 {
                     <div class="alert alert-success">
@@ -19,9 +71,8 @@
                 }
 
                 <div class="alert alert-info">
-                    <strong>User:</strong> @Model.Username<br>
-                    <strong>User ID:</strong> @Model.UserID<br>
-                    <strong>Group:</strong> @Model.Group
+                    <strong>Target User:</strong> @Model.Username<br>
+                    <strong>User Group:</strong> @Model.Group
                 </div>
 
                 <form asp-action="AddQuotaByUsername" method="post">
@@ -30,6 +81,7 @@
                     <input type="hidden" asp-for="UserID" />
                     <input type="hidden" asp-for="Username" />
                     <input type="hidden" asp-for="CopyQuota" />
+                    <input type="hidden" asp-for="Group" />
 
                     <div class="form-group mb-3">
                         <label asp-for="QuotaCHF" class="control-label">Quota Amount (CHF)</label>
@@ -41,31 +93,80 @@
                         <small class="form-text text-muted">Enter the amount in Swiss Francs to add to the user's quota</small>
                     </div>
 
-                    <div class="form-group mb-3">
-                        <label asp-for="Group" class="control-label">User Group</label>
-                        <div class="input-group">
-                            <span class="input-group-text">Group</span>
-                            <input asp-for="Group" class="form-control" readonly style="background-color: #f8f9fa;" />
+                    @* Quick amount buttons *@
+                    <div class="mb-3">
+                        <label class="form-label">Quick Amounts:</label><br>
+                        <div class="btn-group" role="group">
+                            <button type="button" class="btn btn-outline-primary btn-sm quick-amount" data-amount="5.00">5 CHF</button>
+                            <button type="button" class="btn btn-outline-primary btn-sm quick-amount" data-amount="10.00">10 CHF</button>
+                            <button type="button" class="btn btn-outline-primary btn-sm quick-amount" data-amount="20.00">20 CHF</button>
+                            <button type="button" class="btn btn-outline-primary btn-sm quick-amount" data-amount="50.00">50 CHF</button>
                         </div>
-                        <small class="form-text text-muted">This is automatically determined from your account</small>
+                    </div>
+
+                    <div class="alert alert-warning">
+                        <strong>Current Rate:</strong> A4 Black & White printing costs 0.08 CHF per page
                     </div>
 
                     <div class="form-group text-center mt-4">
-                        <button type="submit" class="btn btn-success">Add Quota</button>
-                        <a asp-action="Index" asp-controller="AuthenticationAccess" class="btn btn-secondary">Return to Home</a>
-                        <a asp-action="AuthenticateByUsername" asp-controller="AuthenticationAccess" class="btn btn-outline-primary">Add Quota for Another User</a>
+                        <button type="submit" class="btn btn-success btn-lg">
+                            <i class="fas fa-plus-circle"></i> Add Quota
+                        </button>
+                        <a asp-action="Index" asp-controller="AuthenticationAccess" class="btn btn-secondary">
+                            <i class="fas fa-home"></i> Return to Home
+                        </a>
                     </div>
                 </form>
             </div>
             <div class="card-footer text-muted text-center">
-                <small>This will add CHF quota that can be used for printing services</small>
+                <small>This will add CHF quota that can be used for printing services. Your session will remain active for additional operations.</small>
             </div>
         </div>
     </div>
 </div>
 
-@section Scripts {
-    @{
-        await Html.RenderPartialAsync("_ValidationScriptsPartial");
-    }
-}
+@* Session Management Modals *@
+<div class="modal fade" id="changeUserModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Switch User</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <p>This will end the current session and allow you to login as a different user.</p>
+                <p><strong>Current User:</strong> @Model.Username</p>
+                <p class="text-warning">
+                    <i class="fas fa-exclamation-triangle"></i>
+                    Any unsaved form data will be lost.
+                </p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <a asp-controller="AuthenticationAccess" asp-action="ChangeUser" class="btn btn-warning">
+                    <i class="fas fa-user-friends"></i> Switch User
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="logoutModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Logout</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <p>This will end your current session and return to the main screen.</p>
+                <p><strong>Current User:</strong> @Model.Username</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <a asp-controller="AuthenticationAccess" asp-action="Logout" class="btn btn-danger">
+                    <i class="fas fa-sign-out-alt"></i> Logout
+                </a>
+            </div>
+        </div>
+        </d
